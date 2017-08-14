@@ -2,23 +2,59 @@
 
 namespace MyTravel\Core\Controller;
 
+use ErrorException;
+
 /**
- * Singleton App controller for setting up the application.
+ * Singleton Application controller for setting up the application.
  */
 class App {
 
   protected static $app;
   private $autoloader;
+  private $cbalPrefix;
 
   protected function __construct() {
 
   }
 
-  public static function init() {
+  /**
+   * Interact with the application.
+   * This simply returns the application object.
+   * @return App
+   */
+  public static function get() {
+    return self::$app;
+  }
+  /**
+   * Load the application.
+   * This has to be called before doing anything else that
+   * concerns the application object.
+   * @return self
+   */
+  public static function load() {
     if (!(self::$app instanceof App)) {
       self::$app = new App();
     }
     return self::$app;
+  }
+  /**
+   * Build the application.
+   * This loads all modules,
+   * and dispatches events.
+   * Namely Config and Routing.
+   * @return $this
+   * @throws ErrorException
+   */
+  public function build() {
+    if (empty($this->autoloader)) {
+      throw new ErrorException('No proper autoloader has been set. This is required before building.');
+    }
+    // Load Modules
+    ModuleController::loadModules();
+    // Trigger Config
+    // Trigger Routing
+
+    return $this;
   }
 
   /**
@@ -41,15 +77,31 @@ class App {
    * @param callback $callback Required
    * @param array $prefixes
    */
-  public function addAutoloadPrefixes($callback, $prefixes = array()) {
+  public function setAutoloadPrefixes($callback, $newPrefixes = array()) {
+    // Set callback
+    $this->cbalPrefix = $callback;
     // Add prefixes for default MyTravel
     $prefixes = array_merge(
-      array(array('MyTravel', 'modules')), $prefixes
+      array(
+        array('MyTravel\\Core', 'modules\\Core'),
+        array('Symfony\\Component', 'lib')
+      ), $newPrefixes
     );
     foreach ($prefixes as $prefix) {
-      call_user_func_array(array($this->autoloader, $callback), $prefix);
+      $this->addAutoloadPrefix($prefix[0], $prefix[1]);
     }
     // Support method chaining
+    return $this;
+  }
+  /**
+   * Add more prefixes for sources to the autoloader.
+   * This is used for example by modules to register themselves.
+   * @param type $prefix
+   * @param type $source
+   * @return $this
+   */
+  public function addAutoloadPrefix($prefix, $source) {
+    call_user_func_array(array($this->autoloader, $this->cbalPrefix), array($prefix, $source));
     return $this;
   }
 
