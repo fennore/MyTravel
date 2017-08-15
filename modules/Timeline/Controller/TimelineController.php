@@ -18,8 +18,8 @@ class TimelineController implements ModuleInterface {
     return self::$controller;
   }
 
-  public static function init() {
-
+  public function init() {
+    
   }
 
 }
