@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core;
 
 interface OutputInterface {
 
