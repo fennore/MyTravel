@@ -2,6 +2,7 @@
 
 namespace MyTravel\Core\Controller;
 
+use Throwable;
 use ErrorException;
 
 /**
@@ -46,13 +47,19 @@ class App {
    * @throws ErrorException
    */
   public function build() {
-    if (empty($this->autoloader)) {
-      throw new ErrorException('No proper autoloader has been set. This is required before building.');
+    try {
+      if (empty($this->autoloader)) {
+        throw new ErrorException('No proper autoloader has been set. This is required before building.');
+      }
+      // Load Modules
+      ModuleController::loadModules();
+      // Trigger Config
+      ConfigController::loadConfig();
+      // Trigger Routing
+    } catch (Throwable $ex) {
+      /** @todo add message to php-error list */
+      throw $ex;
     }
-    // Load Modules
-    ModuleController::loadModules();
-    // Trigger Config
-    // Trigger Routing
 
     return $this;
   }
