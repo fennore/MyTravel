@@ -2,7 +2,8 @@
 
 namespace MyTravel\Core;
 
-interface ModuleInterface {
+interface ModuleControllerInterface {
+
   public static function load();
 
   public function init();

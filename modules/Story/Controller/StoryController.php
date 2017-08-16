@@ -2,9 +2,9 @@
 
 namespace MyTravel\Story\Controller;
 
-use MyTravel\Core\ModuleInterface;
+use MyTravel\Core\ModuleControllerInterface;
 
-class StoryController implements ModuleInterface {
+class StoryController implements ModuleControllerInterface {
 
   protected static $controller;
 

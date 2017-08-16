@@ -2,9 +2,10 @@
 
 namespace MyTravel\Timeline\Controller;
 
-use MyTravel\Core\ModuleInterface;
+use MyTravel\Core\ModuleControllerInterface;
 
-class TimelineController implements ModuleInterface {
+class TimelineController implements ModuleControllerInterface {
+
   protected static $controller;
 
   protected function __construct() {

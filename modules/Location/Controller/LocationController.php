@@ -1,9 +1,10 @@
 <?php
 namespace MyTravel\Location\Controller;
 
-use MyTravel\Core\ModuleInterface;
+use MyTravel\Core\ModuleControllerInterface;
 
-class LocationController implements ModuleInterface {
+class LocationController implements ModuleControllerInterface {
+
   protected static $controller;
 
   protected function __construct() {
