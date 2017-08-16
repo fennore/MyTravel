@@ -9,10 +9,28 @@ use ErrorException;
  * Singleton Application controller for setting up the application.
  */
 class App {
-
+  /**
+   * App instance
+   * @var App
+   */
   protected static $app;
+
+  /**
+   * Autoloader object
+   * @var object
+   */
   private $autoloader;
+
+  /**
+   * Autoloader callback to set prefixes
+   * @var callback
+   */
   private $cbalPrefix;
+  //
+  // Application configuration
+
+  private $environment;
+  private $basePath;
 
   protected function __construct() {
 
@@ -43,6 +61,7 @@ class App {
    * This loads all modules,
    * and dispatches events.
    * Namely Config and Routing.
+   * @todo support composer (set composer as autoloader?)
    * @return $this
    * @throws ErrorException
    */
@@ -52,9 +71,9 @@ class App {
         throw new ErrorException('No proper autoloader has been set. This is required before building.');
       }
       // Load Modules
-      ModuleController::loadModules();
+      ModuleController::getModules();
       // Trigger Config
-      ConfigController::loadConfig();
+      ConfigController::getConfig();
       // Trigger Routing
     } catch (Throwable $ex) {
       /** @todo add message to php-error list */
@@ -122,6 +141,14 @@ class App {
     call_user_func_array(array($this->autoloader, $callback), $args);
     // Support method chaining
     return $this;
+  }
+
+  public function inDevelopment() {
+    return $this->environment === 'dev';
+  }
+
+  public function basePath() {
+
   }
 
 }

@@ -13,11 +13,9 @@ class ModuleController {
 
   }
 
-  public static function loadModules() {
+  public static function getModules() {
     if (!(self::$self instanceof ModuleController)) {
       self::$self = new ModuleController();
-    }
-    if (empty(self::$self->modules)) {
       self::$self->modules = self::$self->findModules();
       foreach (self::$self->modules as $module) {
         $module->load();
