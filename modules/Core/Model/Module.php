@@ -3,6 +3,7 @@
 namespace MyTravel\Core\Model;
 
 use ErrorException;
+use OverflowException;
 use ReflectionClass;
 use MyTravel\Core\Controller\App;
 
@@ -27,12 +28,16 @@ class Module {
    * - we can / must unregister an inactive module with the register
    */
   public function load() {
+    $moduleControllerClass = 'MyTravel\\' . $this->name .
+      '\Controller\\' . $this->name . 'Controller';
+    if (isset($this->controller) && $this->controller instanceof $moduleControllerClass) {
+      $msg = 'Controller for module ' . $this->name . ' already set.';
+      throw new OverflowException($msg);
+    }
     // Register the module to the autoloader
     App::get()
       ->addAutoloadPrefix('MyTravel\\' . $this->name, 'modules\\' . $this->name);
     // Check if Class actually exists and not just the file
-    $moduleControllerClass = 'MyTravel\\' . $this->name .
-      '\Controller\\' . $this->name . 'Controller';
     if (!class_exists($moduleControllerClass)) {
       $msg = 'Found controller file for module ' . $this->name . ' but class / namespace is missing.';
       throw new ErrorException($msg);
@@ -45,7 +50,8 @@ class Module {
       $msg = 'Module ' . $this->name . ' should inherit from ModuleInterface.';
       throw new ErrorException($msg);
     }
-    call_user_func_array(array($moduleControllerClass, 'load'), array());
+    $this->controller = call_user_func_array(array($moduleControllerClass, 'load'), array());
+    return $this;
   }
 
 }
