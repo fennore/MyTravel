@@ -26,11 +26,6 @@ class App {
    * @var callback
    */
   private $cbalPrefix;
-  //
-  // Application configuration
-
-  private $environment;
-  private $basePath;
 
   protected function __construct() {
 
@@ -60,7 +55,6 @@ class App {
    * Build the application.
    * This loads all modules,
    * and dispatches events.
-   * Namely Config and Routing.
    * @todo support composer (set composer as autoloader?)
    * @return $this
    * @throws ErrorException
@@ -72,9 +66,8 @@ class App {
       }
       // Load Modules
       ModuleController::getModules();
-      // Trigger Config
-      ConfigController::getConfig();
-      // Trigger Routing
+      // Load Routing
+    //
     } catch (Throwable $ex) {
       /** @todo add message to php-error list */
       throw $ex;
@@ -143,12 +136,22 @@ class App {
     return $this;
   }
 
+  /**
+   * Check if application is considered to be in development environment
+   * @return boolean
+   */
   public function inDevelopment() {
-    return $this->environment === 'dev';
+    return Config::get()->environment === 'dev';
   }
 
+  /**
+   * Get the basepath.
+   * Pretty much redundant. A joke!
+   * Just use Config::get()->basepath instead.
+   * @return string
+   */
   public function basePath() {
-
+    return Config::get()->basepath;
   }
 
 }

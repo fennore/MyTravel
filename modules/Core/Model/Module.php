@@ -6,6 +6,7 @@ use ErrorException;
 use OverflowException;
 use ReflectionClass;
 use MyTravel\Core\Controller\App;
+use MyTravel\Core\Controller\Config;
 
 /**
  * Module wrapper class,
@@ -15,6 +16,8 @@ class Module {
 
   protected $name;
   protected $controller;
+  protected $status;
+  protected $active;
 
   public function __construct($moduleName) {
     $this->name = $moduleName;
@@ -24,7 +27,6 @@ class Module {
    * This will register the module to the autoloader,
    * and register event listeners for setup
    * @todo
-   * - this is the place where we can add active / inactive module
    * - we can / must unregister an inactive module with the register
    */
   public function load() {
@@ -51,6 +53,10 @@ class Module {
       throw new ErrorException($msg);
     }
     $this->controller = call_user_func_array(array($moduleControllerClass, 'load'), array());
+    // Load module configuration
+    $this->status = Config::get()->modules[$this->name]['status'] ?? 'prod';
+    $this->active = Config::get()->modules[$this->name]['active'] ?? true;
+    // Return for method chaining
     return $this;
   }
 
