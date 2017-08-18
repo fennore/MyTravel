@@ -12,28 +12,29 @@ database:
       directory: db-sqlite
       name: mytravel
 routing:
-  home:
-    path: ''
-    method: GET
-    callback: [MyTravel\Core\Controller\Page, viewHomePage]
-  about:
-    path: about
-    method: GET
-    callback: [MyTravel\Core\Controller\Page, viewAboutPage]
-  imgedit:
-    path: edit/image
-    method: GET
-    callback: [MyTravel\Core\Controller\Page, viewEditImagePage]
-  imagefile:
-    path: img/[*:title]/[**:trailing]?
-    method: GET
-    callback: [MyTravel\Core\Controller\Image, viewImage]
-  jsbundle:
-    path: js/bundle
-    method: GET
-    callback: [MyTravel\Core\Controller\Js, viewJsBundle]
-  cssbundle:
-    path: css/bundle
-    method: GET
-    callback: [MyTravel\Core\Controller\Css, viewCssBundle]
+  routes:
+    home:
+      path: ''
+      method: GET
+      callback: [MyTravel\Core\Controller\Page, viewHomePage]
+    about:
+      path: about
+      method: GET
+      callback: [MyTravel\Core\Controller\Page, viewAboutPage]
+    imgeditlist:
+      path: edit/image
+      method: GET
+      callback: [MyTravel\Core\Controller\Page, viewEditImagePage]
+    imagefile:
+      path: img/[*:title]/[**:trailing]?
+      method: GET
+      callback: [MyTravel\Core\Controller\Image, viewImage]
+    jsbundle:
+      path: js/bundle
+      method: GET
+      callback: [MyTravel\Core\Controller\Js, viewJsBundle]
+    cssbundle:
+      path: css/bundle
+      method: GET
+      callback: [MyTravel\Core\Controller\Css, viewCssBundle]
   
