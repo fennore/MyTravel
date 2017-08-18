@@ -4,6 +4,7 @@ namespace MyTravel\Core\Controller;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use MyTravel\Core\Event\ConfigNodeEvent;
 
 class ApplicationConfiguration implements ConfigurationInterface {
 
@@ -29,8 +30,10 @@ class ApplicationConfiguration implements ConfigurationInterface {
       ->end()
       ->end()
     ;
+    // Dispatch event for altering application config node
+    $event = new ConfigNodeEvent($node);
+    App::event()->dispatch('module.config.application', $event);
     // Directories
-    // Expandable by modules
     $this->buildDirectoryNode($node);
     $node->end();
     return $treeBuilder;
@@ -42,19 +45,17 @@ class ApplicationConfiguration implements ConfigurationInterface {
    * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $node
    */
   private function buildDirectoryNode($node) {
-    $defaultDirs = array(
-      'files' => 'files',
-      'images' => 'files/images',
-      'themes' => 'themes'
-    );
     $subnode = $node
       ->arrayNode('directories')
-      ->addDefaultsIfNotSet()
-      ->children()
-    ;
-    foreach ($defaultDirs as $ref => $dir) {
-      $subnode->scalarNode($ref)->defaultValue($dir)->end();
-    }
+        ->addDefaultsIfNotSet()
+        ->children()
+          ->scalarNode('files')->defaultValue('files')->end()
+        ->scalarNode('images')->defaultValue('files/images')->end()
+        ->scalarNode('themes')->defaultValue('themes')->end();
+
+    // Dispatch event for altering application directories config node
+    $event = new ConfigNodeEvent($subnode);
+    App::event()->dispatch('module.config.application.directories', $event);
     // Close the sub tree branches
     $node
       ->end()

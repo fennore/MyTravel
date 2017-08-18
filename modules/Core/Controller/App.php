@@ -4,6 +4,7 @@ namespace MyTravel\Core\Controller;
 
 use Throwable;
 use ErrorException;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -27,6 +28,12 @@ class App {
    */
   private $cbalPrefix;
 
+  /**
+   * Service container for the application
+   * @var Symfony\Component\DependencyInjection\ContainerBuilder
+   */
+  private $serviceContainer;
+
   protected function __construct() {
 
   }
@@ -34,11 +41,27 @@ class App {
   /**
    * Interact with the application.
    * This simply returns the application object.
-   * @return App
+   * @return MyTravel\Core\Controller\App
    */
   public static function get() {
     return self::$app;
   }
+
+  /**
+   * Get the service container
+   * @return Symfony\Component\DependencyInjection\ContainerBuilder
+   */
+  public static function service() {
+    return self::$app->serviceContainer;
+  }
+  /**
+   * Short alias for App::service()->get('events')
+   * @return Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  public static function event() {
+    return self::service()->get('events');
+  }
+
   /**
    * Load the application.
    * This has to be called before doing anything else that
@@ -46,8 +69,8 @@ class App {
    * @return self
    */
   public static function load() {
-    if (!(self::$app instanceof App)) {
-      self::$app = new App();
+    if (!(self::$app instanceof self)) {
+      self::$app = new self();
     }
     return self::$app;
   }
@@ -64,16 +87,64 @@ class App {
       if (empty($this->autoloader)) {
         throw new ErrorException('No proper autoloader has been set. This is required before building.');
       }
+      // Set services container
+      $this->setServices();
+      // Database
       // Load Modules
-      ModuleController::getModules();
-      // Load Routing
-    //
+      // => this needs to be done first after setting services
+      self::service()
+        ->get('modules')
+        ->load();
+      // Build Routing
+      // - routing is build by modules
+      //  => routing needs to be loaded after loading modules
+      self::service()
+        ->get('routing')
+        ->build();
+      // Initialize modules
+      // - this will load config
+      // - config can update routing
+      //  => routing needs to be loaded before initializing modules
+      self::service()
+        ->get('modules')
+        ->init();
+      //
+      var_dump(self::service()->get('routing')->routes());
+      var_dump(self::service()->get('config')->routing['routes']);
+      var_dump(self::service()->get('config')->directories);
+      var_dump(self::service()->get('config')->database['connections']);
     } catch (Throwable $ex) {
       /** @todo add message to php-error list */
       throw $ex;
     }
 
     return $this;
+  }
+
+  /**
+   * Make application services directly available,
+   * through the application from anywhere.
+   * Use App::service() to access any service,
+   * or use App::event() as alias to access the events service.
+   */
+  private function setServices() {
+    $this->serviceContainer = new ContainerBuilder();
+    // Register some services
+    // Config
+    $this->serviceContainer
+      ->register('config')
+      ->setFactory('MyTravel\Core\Controller\Config::setService');
+    // Modules
+    $this->serviceContainer
+      ->register('modules')
+      ->setFactory('MyTravel\Core\Controller\Modules::setService');
+    // Routing
+    $this->serviceContainer
+      ->register('routing')
+      ->setFactory('MyTravel\Core\Controller\Routing::setService');
+    // Event dispatcher
+    $this->serviceContainer
+      ->register('events', 'Symfony\Component\EventDispatcher\EventDispatcher');
   }
 
   /**
@@ -103,7 +174,8 @@ class App {
     $prefixes = array_merge(
       array(
         array('MyTravel\\Core', 'modules\\Core'),
-        array('Symfony\\Component', 'lib')
+        array('Symfony\\Component', 'lib'),
+        array('Psr\\Container', 'lib\Psr\src')
       ), $newPrefixes
     );
     foreach ($prefixes as $prefix) {

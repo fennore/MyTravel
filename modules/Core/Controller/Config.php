@@ -2,12 +2,13 @@
 
 namespace MyTravel\Core\Controller;
 
+use MyTravel\Core\ServiceFactoryInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Definition\Processor;
 
-class Config {
+class Config implements ServiceFactoryInterface {
 
   protected static $config;
   private $configurationTree;
@@ -16,9 +17,21 @@ class Config {
 
   }
 
+  /**
+   * Short alias for App::service()->get('config')
+   * @return Config
+   */
   public static function get() {
-    if (!(self::$config instanceof Config)) {
-      self::$config = new Config();
+    return App::service()->get('config');
+  }
+
+  /**
+   * Set config as service
+   * @return self
+   */
+  public static function setService() {
+    if (!(self::$config instanceof self)) {
+      self::$config = new self();
       self::$config->configurationTree = self::$config->buildConfig();
     }
     return self::$config;
@@ -36,25 +49,12 @@ class Config {
     // Wrap in a try as a config file is optional and can be pure default values
     $fileConfig = array();
     try {
-      $configDirectories = array('./config');
-      $locator = new FileLocator($configDirectories);
-      // for now we only support the one and only config.yml
-
-
-      $configFile = $locator->locate('config.yml', null, true);
-      $configResolvers = array(
-        new YamlConfigLoader($locator)
-      );
-
-      $loaderResolver = new LoaderResolver($configResolvers);
-      $delegatingLoader = new DelegatingLoader($loaderResolver);
-
-      $fileConfig = $delegatingLoader->load($configFile);
+      $fileConfig = $this->loadFromFile();
     } catch (Throwable $ex) {
-      // throw any throwable as it will be caught on the next level
+      // Rethrow any throwable as it will be caught on the next level
       throw $ex;
     } finally {
-      // Load config processor
+      // Set config processor
       $processor = new Processor();
       $appFileConfig = array_diff_key($fileConfig, array('database' => null, 'routing' => null));
       $dbFileConfig = $fileConfig['database'] ?? array();
@@ -69,15 +69,36 @@ class Config {
         new DatabaseConfiguration(), array($dbFileConfig)
       );
       // Load routing setup, only paths can be altered in config
-      /* $routingConfig = $processor->processConfiguration(
+      $routingConfig = $processor->processConfiguration(
         new RoutingConfiguration(), array($routingFileConfig)
-        ); */
+      );
       $fullConfig = $appConfig +
-        array('database' => $dbConfig) /* +
-        array('routing' => $routingConfig) */
+        array('database' => $dbConfig) +
+        array('routing' => $routingConfig)
       ;
       return $fullConfig;
     }
+  }
+
+  /**
+   * Load configuration from file
+   * @return array
+   */
+  protected function loadFromFile() {
+    // On a quest to load config from file
+    $configDirectories = array('./config');
+    $locator = new FileLocator($configDirectories);
+
+    // For now we only support the one and only config.yml
+    $configFile = $locator->locate('config.yml', null, true);
+    $configResolvers = array(
+      new YamlConfigLoader($locator)
+    );
+
+    $loaderResolver = new LoaderResolver($configResolvers);
+    $delegatingLoader = new DelegatingLoader($loaderResolver);
+
+    return $delegatingLoader->load($configFile);
   }
 
 }
