@@ -4,30 +4,59 @@ namespace MyTravel\Core\Controller;
 
 use ErrorException;
 use ReflectionClass;
-use Symfony\Component\Finder\Finder;
+use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Model\Module;
+use Symfony\Component\Finder\Finder;
 
-class ModuleController {
-  protected static $self;
+
+class Modules implements ServiceFactoryInterface {
+
+  protected static $controller;
   private $modules;
 
   protected function __construct() {
 
   }
 
-  /**
-   * Return an array of Module instances
-   * @return array
-   */
-  public static function getModules() {
-    if (!(self::$self instanceof ModuleController)) {
-      self::$self = new ModuleController();
-      self::$self->modules = self::$self->findModules();
-      foreach (self::$self->modules as $module) {
-        $module->load();
-      }
+  public static function get() {
+    return App::service()->get('modules');
+  }
+
+  public static function setService() {
+    if (!(self::$controller instanceof self)) {
+      self::$controller = new self();
     }
-    return self::$self->modules;
+    return self::$controller;
+  }
+
+  /**
+   * Load the modules.
+   * This loads all things necessary before actually
+   * firing them up.
+   * @return $this
+   */
+  public function load() {
+    if (!isset($this->modules)) {
+      $this->modules = $this->find();
+    }
+    foreach ($this->modules as $module) {
+      $module->load();
+    }
+    return $this;
+  }
+  /**
+   * Initialize loaded modules
+   * @throws ErrorException
+   */
+  public function init() {
+    if (!isset($this->modules)) {
+      $msg = 'Before initializing you need to load the modules';
+      throw new ErrorException($msg);
+    }
+    foreach ($this->modules as $module) {
+      $module->init();
+    }
+    return $this;
   }
 
   /**
@@ -38,7 +67,7 @@ class ModuleController {
    *
    * @return array
    */
-  private function findModules() {
+  private function find() {
     $moduleList = array();
     $finder = new Finder();
     $finder->files()->in('./modules')->depth('<3');
@@ -51,8 +80,10 @@ class ModuleController {
       $validFile = $fileName === $moduleName . 'Controller.php';
       $validDirectory = isset($pathSections[0]) ? $pathSections[0] === 'Controller' : false;
       // Add the module prefix to the autoloader
-      App::get()
-        ->addAutoloadPrefix('MyTravel\\' . $moduleName, 'modules\\' . $moduleName);
+      if ($validFile && $validDirectory) {
+        App::get()
+          ->addAutoloadPrefix('MyTravel\\' . $moduleName, 'modules\\' . $moduleName);
+      }
       if ($validFile && $validDirectory && $this->validateControllerClass($moduleControllerClass)) {
         array_push($moduleList, new Module($moduleName));
       }
@@ -65,6 +96,7 @@ class ModuleController {
    * The controller must inherit from ModuleControllerInterface.
    * The classname and namespace must be set according to PSR-4.
    * @param string $moduleControllerClass
+   * @return boolean
    * @throws ErrorException
    */
   private function validateControllerClass($moduleControllerClass) {
@@ -81,6 +113,8 @@ class ModuleController {
       $msg = $moduleControllerClass . ' should inherit from ModuleControllerInterface.';
       throw new ErrorException($msg);
     }
+    // Code managed to reach which means its a valid controller class
+    return true;
   }
 
 }

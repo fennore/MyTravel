@@ -35,7 +35,7 @@ class Module {
   /**
    * Load the module.
    * This will register the module to the autoloader,
-   * and load module configuration.
+   * and add module event listeners.
    * @todo
    * - we can / must unregister an inactive module with the register
    */
@@ -44,12 +44,15 @@ class Module {
       '\Controller\\' . $this->name . 'Controller';
     $this->checkIfAlreadyLoaded($moduleControllerClass);
     $this->controller = call_user_func_array(array($moduleControllerClass, 'load'), array());
-    // Load module configuration
-    $this->status = Config::get()->modules[$this->name]['status'] ?? 'prod';
-    $this->active = Config::get()->modules[$this->name]['active'] ?? true;
     //
     // Return for method chaining
     return $this;
+  }
+
+  public function init() {
+    // Load module configuration
+    $this->status = Config::get()->modules[$this->name]['status'] ?? 'prod';
+    $this->active = Config::get()->modules[$this->name]['active'] ?? true;
   }
 
 }
