@@ -2,12 +2,16 @@
 
 namespace MyTravel\Core\Controller;
 
-class Page {
-  public function viewHomePage() {
+/**
+ * @todo should use database and stuff
+ */
+class PageFactory {
+
+  public static function viewHomePage() {
     
   }
-  public function viewAboutPage() {
-
+  public static function viewAboutPage() {
+    
   }
   public function viewEditImagePage() {
 
