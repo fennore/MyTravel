@@ -9,7 +9,7 @@ use MyTravel\Core\Model\Module;
 use Symfony\Component\Finder\Finder;
 
 
-class Modules implements ServiceFactoryInterface {
+final class Modules implements ServiceFactoryInterface {
 
   protected static $controller;
   private $modules;

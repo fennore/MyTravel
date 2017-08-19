@@ -10,7 +10,8 @@ use MyTravel\Core\Event\RoutingEvent;
 /**
  * Singleton service factory for routing
  */
-class Routing implements ServiceFactoryInterface {
+final class Routing implements ServiceFactoryInterface {
+
   /**
    * Being itself
    * @var MyTravel\Core\Controller\Routing

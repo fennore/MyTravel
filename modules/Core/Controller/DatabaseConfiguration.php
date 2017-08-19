@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use MyTravel\Core\Event\ConfigNodeEvent;
 
-class DatabaseConfiguration implements ConfigurationInterface {
+final class DatabaseConfiguration implements ConfigurationInterface {
 
   public function getConfigTreeBuilder() {
     $treeBuilder = new TreeBuilder();

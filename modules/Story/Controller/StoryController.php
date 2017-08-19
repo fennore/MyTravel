@@ -5,7 +5,7 @@ namespace MyTravel\Story\Controller;
 use MyTravel\Core\ModuleControllerInterface;
 use MyTravel\Core\Controller\App;
 
-class StoryController implements ModuleControllerInterface {
+final class StoryController implements ModuleControllerInterface {
 
   protected static $controller;
 

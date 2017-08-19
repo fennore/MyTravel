@@ -8,7 +8,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Definition\Processor;
 
-class Config implements ServiceFactoryInterface {
+final class Config implements ServiceFactoryInterface {
 
   protected static $config;
   private $configurationTree;

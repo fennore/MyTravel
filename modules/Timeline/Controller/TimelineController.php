@@ -4,7 +4,7 @@ namespace MyTravel\Timeline\Controller;
 
 use MyTravel\Core\ModuleControllerInterface;
 
-class TimelineController implements ModuleControllerInterface {
+final class TimelineController implements ModuleControllerInterface {
 
   protected static $controller;
 

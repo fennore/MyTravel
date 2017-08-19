@@ -3,7 +3,7 @@ namespace MyTravel\Location\Controller;
 
 use MyTravel\Core\ModuleControllerInterface;
 
-class LocationController implements ModuleControllerInterface {
+final class LocationController implements ModuleControllerInterface {
 
   protected static $controller;
 

@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use MyTravel\Core\Event\ConfigNodeEvent;
 
-class RoutingConfiguration implements ConfigurationInterface {
+final class RoutingConfiguration implements ConfigurationInterface {
 
   public function getConfigTreeBuilder() {
     $treeBuilder = new TreeBuilder();
