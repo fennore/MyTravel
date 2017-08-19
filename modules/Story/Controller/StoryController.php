@@ -15,9 +15,13 @@ class StoryController implements ModuleControllerInterface {
 
   private function addListeners() {
     // Callback
-    $cb = array(new StoryConfig(), 'applicationDirectories');
+    $cb = array(new Config(), 'applicationDirectories');
     App::event()
       ->addListener('module.config.application.directories', $cb);
+    // Callback
+    $cb = array(new Routing(), 'build');
+    App::event()
+      ->addListener('module.routing.routes.build', $cb);
   }
 
   public static function load() {

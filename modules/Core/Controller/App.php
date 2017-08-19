@@ -108,11 +108,11 @@ class App {
       self::service()
         ->get('modules')
         ->init();
+      // Update Routing from config
+      self::service()
+        ->get('routing')
+        ->update();
       //
-      var_dump(self::service()->get('routing')->routes());
-      var_dump(self::service()->get('config')->routing['routes']);
-      var_dump(self::service()->get('config')->directories);
-      var_dump(self::service()->get('config')->database['connections']);
     } catch (Throwable $ex) {
       /** @todo add message to php-error list */
       throw $ex;
@@ -145,6 +145,8 @@ class App {
     // Event dispatcher
     $this->serviceContainer
       ->register('events', 'Symfony\Component\EventDispatcher\EventDispatcher');
+    // Database
+    //
   }
 
   /**

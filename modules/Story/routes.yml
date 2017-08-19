@@ -1,0 +1,5 @@
+storyview:
+  path: story/{title}
+  methods: GET
+  schemes: https
+  defaults: { callback: 'MyTravel\Story\Controller\StoryController::viewStory'}

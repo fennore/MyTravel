@@ -4,6 +4,7 @@ namespace MyTravel\Core\Controller;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use MyTravel\Core\Event\ConfigNodeEvent;
 
 class RoutingConfiguration implements ConfigurationInterface {
@@ -12,42 +13,44 @@ class RoutingConfiguration implements ConfigurationInterface {
     $treeBuilder = new TreeBuilder();
     $node = $treeBuilder
       ->root('routing')
+      ->children()
+      ->arrayNode('routes')
+      ->addDefaultsIfNotSet()
       ->children();
-    // 1. Collect routes
-    /**
-     * Note!
-     * Only paths should be adjustable through the config
-     * So only the path should be known in the config tree,
-     * for each named node.
-     * Only the homepage should have a fixed path but adjustable callback.
-     */
-    // 2. Set adjustable route info in config tree
-    $node
-      ->arrayNode('routes')->addDefaultsIfNotSet()->children()
-      ->arrayNode('home')->addDefaultsIfNotSet()->children()
-      ->arrayNode('callback')->prototype('scalar')->end()->end()
-      ->end()->end()
-      ->arrayNode('about')->addDefaultsIfNotSet()->children()
-      ->scalarNode('path')->defaultValue('about')->end()
-      ->end()->end()
-      ->arrayNode('imgeditlist')->addDefaultsIfNotSet()->children()
-      ->scalarNode('path')->defaultValue('edit/images')->end()
-      ->end()->end()
-      ->arrayNode('imgfileview')->addDefaultsIfNotSet()->children()
-      ->scalarNode('path')->defaultValue('img/[*:title]/[**:trailing]?')->end()
-      ->end()->end()
-      ->arrayNode('jsbundle')->addDefaultsIfNotSet()->children()
-      ->scalarNode('path')->defaultValue('js/bundle')->end()
-      ->end()->end()
-      ->arrayNode('cssbundle')->addDefaultsIfNotSet()->children()
-      ->scalarNode('path')->defaultValue('css/bundle')->end()
-      ->end()->end()
-      ->end()->end();
-    // Dispatch event for altering application config node
-    $event = new ConfigNodeEvent($node);
-    App::event()->dispatch('module.config.routes', $event);
+    
+    $this->addConfigFromRouting($node);
+    $node->end()->end();
     //
     return $treeBuilder;
+  }
+  /**
+   * Adding routes to config so they can be changed there
+   * Note!
+   * Only paths should be adjustable through the config.
+   * So only the path should be known in the config tree,
+   * for each named node.
+   * Only the homepage should have a fixed path but adjustable callback.
+   */
+  private function addConfigFromRouting(NodeBuilder $node) {
+    // 1. Collect routes
+    $routes = Routing::get()
+      ->routes()
+      ->all();
+    // 2. Add routes to config
+    // home
+    $node->arrayNode('home')->addDefaultsIfNotSet()->children()
+      ->arrayNode('callback')->prototype('scalar')->end()->end()
+      ->end()->end();
+    // rest
+    foreach ($routes as $name => $route) {
+      // skip home
+      if ($name === 'home') {
+        continue;
+      }
+      $node->arrayNode($name)->addDefaultsIfNotSet()->children()
+        ->scalarNode('path')->defaultValue($route->getPath())->end()
+        ->end()->end();
+    }
   }
 
 }

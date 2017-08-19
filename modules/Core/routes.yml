@@ -1,0 +1,30 @@
+home:
+  path: ''
+  methods: GET
+  schemes: https
+  defaults: { callback: 'MyTravel\Core\Controller\Page::viewHomePage' }
+about:
+  path: about
+  methods: GET
+  schemes: https
+  defaults: { callback: 'MyTravel\Core\Controller\Page::viewAboutPage'}
+imgeditlist:
+  path: edit/image
+  methods: GET
+  schemes: https
+  defaults: { callback: MyTravel\Core\Controller\Page::viewEditImagePage' }
+imgfileview:
+  path: img/{title}/{trailing}
+  methods: GET
+  schemes: https
+  defaults: { callback: 'MyTravel\Core\Controller\Image::viewImage' }
+jsbundle:
+  path: js/bundle
+  methods: GET
+  schemes: https
+  defaults: { callback: 'MyTravel\Core\Controller\Page::viewJsBundle' }
+cssbundle:
+  path: css/bundle
+  methods: GET
+  schemes: https
+  defaults: { callback: 'MyTravel\Core\Controller\Page::viewCssBundle' }
