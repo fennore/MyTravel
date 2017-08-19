@@ -2,29 +2,29 @@ home:
   path: ''
   methods: GET
   schemes: https
-  defaults: { callback: 'MyTravel\Core\Controller\Page::viewHomePage' }
+  defaults: { _controller: MyTravel\Core\Controller\PageFactory::viewHomePage }
 about:
   path: about
   methods: GET
   schemes: https
-  defaults: { callback: 'MyTravel\Core\Controller\Page::viewAboutPage'}
+  defaults: { _controller: MyTravel\Core\Controller\PageFactory::viewAboutPage }
 imgeditlist:
-  path: edit/image
+  path: edit/image/{id}
   methods: GET
   schemes: https
-  defaults: { callback: MyTravel\Core\Controller\Page::viewEditImagePage' }
+  defaults: { _controller: MyTravel\Core\Controller\PageFactory::viewEditImagePage, id: }
 imgfileview:
   path: img/{title}/{trailing}
   methods: GET
   schemes: https
-  defaults: { callback: 'MyTravel\Core\Controller\Image::viewImage' }
+  defaults: { _controller: MyTravel\Core\Controller\Image::viewImage, trailing: }
 jsbundle:
   path: js/bundle
   methods: GET
   schemes: https
-  defaults: { callback: 'MyTravel\Core\Controller\Page::viewJsBundle' }
+  defaults: { _controller: MyTravel\Core\Controller\Js::viewJsBundle }
 cssbundle:
   path: css/bundle
   methods: GET
   schemes: https
-  defaults: { callback: 'MyTravel\Core\Controller\Page::viewCssBundle' }
+  defaults: { _controller: MyTravel\Core\Controller\Css::viewCssBundle }

@@ -13,4 +13,5 @@ $app
   ->registerAutoloader('register', array(true));
 
 $app
-  ->build();
+  ->build()
+  ->output();

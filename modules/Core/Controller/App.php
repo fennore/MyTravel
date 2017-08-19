@@ -5,6 +5,14 @@ namespace MyTravel\Core\Controller;
 use Throwable;
 use ErrorException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ControllerResolver;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\RequestContext;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -76,8 +84,7 @@ class App {
   }
   /**
    * Build the application.
-   * This loads all modules,
-   * and dispatches events.
+   * This loads all modules, and dispatches events.
    * @todo support composer (set composer as autoloader?)
    * @return $this
    * @throws ErrorException
@@ -117,6 +124,32 @@ class App {
       /** @todo add message to php-error list */
       throw $ex;
     }
+
+    return $this;
+  }
+  /**
+   * Handles the application output.
+   * @return $this
+   */
+  public function output() {
+    $theming = new Theming();
+    $theming->load();
+    // Create request object
+    $request = Request::createFromGlobals();
+    // Create matcher
+    $matcher = new UrlMatcher(Routing::get()->routes(), new RequestContext());
+    // Subscribe a route listener to the events
+    self::event()
+      ->addSubscriber(new RouterListener($matcher, new RequestStack()));
+    // Create kernel object
+    $kernel = new HttpKernel(
+      self::event(), new ControllerResolver(), new RequestStack(), new ArgumentResolver()
+    );
+
+    $response = $kernel->handle($request);
+    $response->send();
+
+    $kernel->terminate($request, $response);
 
     return $this;
   }
