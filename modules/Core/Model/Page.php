@@ -3,33 +3,34 @@ namespace MyTravel\Core\Model;
 
 /**
  * The page object.
- * Contains all data needed to show a full page.
- * For now just dumbly shows a static page template.
- * @todo pretty much everything
- *  - link to database
- *  - figure out how far it should go
- *  - should probably contain everyting (menu, blocks, .....)
- *    or at least the information for everything
+ * Contains all data needed to show a full page,
+ * through a given template file.
  */
 class Page {
+
+  /**
+   * Views subpath to template file
+   * @var string
+   */
   private $template;
 
   /**
-   *
-   * @param string $template The path to the template file
+   * Variables for the template file
+   * @var array
    */
-  public function __construct($template) {
+  private $variables;
+
+  public function __construct($template, $variables) {
     $this->template = $template;
+    $this->variables = $variables;
   }
 
-  /**
-   * Page output
-   * @todo pretty much everything
-   * @return noideayet
-   */
-  public function view() {
-    // should return the file content, not the path
+  public function getTemplate() {
     return $this->template;
+  }
+
+  public function getVariables() {
+    return $this->variables;
   }
 
 }

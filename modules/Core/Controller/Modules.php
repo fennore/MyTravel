@@ -82,7 +82,7 @@ class Modules implements ServiceFactoryInterface {
       // Add the module prefix to the autoloader
       if ($validFile && $validDirectory) {
         App::get()
-          ->addAutoloadPrefix('MyTravel\\' . $moduleName, 'modules\\' . $moduleName);
+          ->addAutoloadPrefix('psr-4', 'MyTravel\\' . $moduleName, 'modules\\' . $moduleName);
       }
       if ($validFile && $validDirectory && $this->validateControllerClass($moduleControllerClass)) {
         array_push($moduleList, new Module($moduleName));

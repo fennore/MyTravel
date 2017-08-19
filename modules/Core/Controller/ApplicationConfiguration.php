@@ -20,7 +20,7 @@ class ApplicationConfiguration implements ConfigurationInterface {
       ->info('Which environment the application currently runs (dev|staging|prod).')
       ->end()
       ->scalarNode('basepath')->defaultValue('/')->end()
-      ->scalarNode('theme')->defaultValue('default')->end()
+      ->scalarNode('view')->defaultValue('default')->end()
       ->arrayNode('modules')
       ->useAttributeAsKey('name')
       ->prototype('array')
@@ -51,7 +51,7 @@ class ApplicationConfiguration implements ConfigurationInterface {
         ->children()
           ->scalarNode('files')->defaultValue('files')->end()
         ->scalarNode('images')->defaultValue('files/images')->end()
-        ->scalarNode('themes')->defaultValue('themes')->end();
+        ->scalarNode('views')->defaultValue('views')->end();
 
     // Dispatch event for altering application directories config node
     $event = new ConfigNodeEvent($subnode);

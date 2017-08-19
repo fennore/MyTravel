@@ -189,10 +189,10 @@ class App {
    * @param string $autoloaderPath Required. Path to the file containing the autoloader
    * @param callback $callback Required.
    */
-  public function setAutoloader($autoloaderPath, $instanceCall) {
+  public function setAutoloader($id, $autoloaderPath, $instanceCall) {
     // Uses
     require_once './' . $autoloaderPath;
-    $this->autoloader = new $instanceCall();
+    $this->autoloader[$id] = new $instanceCall();
     // Support method chaining
     return $this;
   }
@@ -202,19 +202,19 @@ class App {
    * @param callback $callback Required
    * @param array $prefixes
    */
-  public function setAutoloadPrefixes($callback, $newPrefixes = array()) {
+  public function setAutoloadPrefixes($id, $callback, $newPrefixes = array()) {
     // Set callback
-    $this->cbalPrefix = $callback;
+    $this->cbalPrefix[$id] = $callback;
     // Add prefixes for default MyTravel
     $prefixes = array_merge(
       array(
-        array('MyTravel\\Core', 'modules\\Core'),
-        array('Symfony\\Component', 'lib'),
-        array('Psr\\Container', 'lib\Psr\src')
+        array('MyTravel\Core', 'modules/Core'),
+        array('Symfony\Component', 'lib'),
+        array('Psr\Container', 'lib/Psr/src')
       ), $newPrefixes
     );
     foreach ($prefixes as $prefix) {
-      $this->addAutoloadPrefix($prefix[0], $prefix[1]);
+      $this->addAutoloadPrefix($id, $prefix[0], $prefix[1]);
     }
     // Support method chaining
     return $this;
@@ -226,8 +226,8 @@ class App {
    * @param type $source
    * @return $this
    */
-  public function addAutoloadPrefix($prefix, $source) {
-    call_user_func_array(array($this->autoloader, $this->cbalPrefix), array($prefix, $source));
+  public function addAutoloadPrefix($id, $prefix, $source) {
+    call_user_func_array(array($this->autoloader[$id], $this->cbalPrefix[$id]), array($prefix, $source));
     return $this;
   }
 
@@ -237,8 +237,8 @@ class App {
    * @param array $args Array of arguments for the autoloader register callback.
    * @return $this
    */
-  public function registerAutoloader($callback, $args = array()) {
-    call_user_func_array(array($this->autoloader, $callback), $args);
+  public function registerAutoloader($id, $callback, $args = array()) {
+    call_user_func_array(array($this->autoloader[$id], $callback), $args);
     // Support method chaining
     return $this;
   }
