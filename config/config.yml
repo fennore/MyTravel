@@ -1,4 +1,0 @@
-routing:
-  routes:
-    about:
-      path: info

@@ -76,7 +76,7 @@ final class Config implements ServiceFactoryInterface {
         array('database' => $dbConfig) +
         array('routing' => $routingConfig)
       ;
-      return $fullConfig;
+      return $this->verify($fullConfig);
     }
   }
 
@@ -99,6 +99,14 @@ final class Config implements ServiceFactoryInterface {
     $delegatingLoader = new DelegatingLoader($loaderResolver);
 
     return $delegatingLoader->load($configFile);
+  }
+
+  /**
+   * Make sure all configuration values contain proper values
+   */
+  private function verify($config) {
+    $config['basepath'] = \preg_replace('/\/+/', '/', '/' . $config['basepath'] . '/');
+    return $config;
   }
 
 }

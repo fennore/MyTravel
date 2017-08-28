@@ -274,4 +274,15 @@ class App {
     return Config::get()->basepath;
   }
 
+  /**
+   * @todo use an authentication service (Symfony)
+   * @param type $key
+   * @param type $access
+   * @param type $user
+   * @return boolean
+   */
+  public function hasAccess($key = 'default', $access = array(), $user = null) {
+    return Config::get()->environment === 'dev';
+  }
+
 }
