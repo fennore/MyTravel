@@ -3,7 +3,6 @@
 namespace MyTravel\Core\Model;
 
 use OverflowException;
-use MyTravel\Core\Controller\App;
 use MyTravel\Core\Controller\Config;
 
 /**
@@ -20,6 +19,15 @@ class Module {
   public function __construct($moduleName) {
     $this->name = $moduleName;
   }
+
+  public function __isset($name) {
+    return isset($this->$name);
+  }
+
+  public function __get($name) {
+    return $this->$name;
+  }
+
   /**
    * Only load the controller once.
    * @param string $moduleControllerClass

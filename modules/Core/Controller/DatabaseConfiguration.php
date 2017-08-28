@@ -2,15 +2,21 @@
 
 namespace MyTravel\Core\Controller;
 
+use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use MyTravel\Core\Event\ConfigNodeEvent;
 
+/**
+ * @todo provide information to the config treebuilder.
+ * Connection configuration validation is directly linked with Doctrine ORM.
+ */
 final class DatabaseConfiguration implements ConfigurationInterface {
 
   public function getConfigTreeBuilder() {
     $treeBuilder = new TreeBuilder();
+    // Get drivers
+    $allowedDrivers = DriverManager::getAvailableDrivers();
     // Build the tree
     $node = $treeBuilder
       ->root('database')
@@ -22,21 +28,23 @@ final class DatabaseConfiguration implements ConfigurationInterface {
         ->useAttributeAsKey('name')
       ->defaultValue(array(
         'sqlite' => array(
-          'driver' => 'sqlite',
-          'directory' => 'db-sqlite',
-          'dbname' => 'mytravel'
+          'driver' => 'pdo_sqlite',
+          'path' => './db-sqlite/mytravel.sqlite',
         )
       ))
       ->prototype('array')
       ->children()
       ->enumNode('driver')
-      ->defaultValue('sqlite')
-      ->values(array('mysql', 'sqlite', 'mssql'))
+        ->defaultValue('pdo_sqlite')
+        ->values($allowedDrivers)
       ->end()
-      ->scalarNode('directory')->defaultValue('db-sqlite')->end()
+      ->scalarNode('driverClass')->end()
+      ->scalarNode('pdo')->end()
       ->scalarNode('dbname')->end()
       ->scalarNode('user')->end()
       ->scalarNode('password')->end()
+      ->scalarNode('host')->end()
+      ->scalarNode('path')->end()
       ->end()
             ->end()
           ->end()

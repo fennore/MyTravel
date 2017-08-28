@@ -1,0 +1,16 @@
+MyTravel\Core\Model\File:
+  type: entity
+  table: file
+  id:
+    id:
+      type: bigint
+      generator:
+        strategy: AUTO
+  fields:
+    source:
+      unique: true
+    lastmodified:
+      type: integer
+      unsigned: true
+    data:
+      type: blob

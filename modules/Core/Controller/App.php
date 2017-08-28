@@ -62,6 +62,7 @@ class App {
   public static function service() {
     return self::$app->serviceContainer;
   }
+
   /**
    * Short alias for App::service()->get('events')
    * @return Symfony\Component\EventDispatcher\EventDispatcher
@@ -82,6 +83,7 @@ class App {
     }
     return self::$app;
   }
+
   /**
    * Build the application.
    * This loads all modules, and dispatches events.
@@ -96,37 +98,45 @@ class App {
       }
       // Set services container
       $this->setServices();
-      // Database
       // Load Modules
       // => this needs to be done first after setting services
-      self::service()
+      $this->serviceContainer
         ->get('modules')
         ->load();
       // Build Routing
       // - routing is build by modules
       //  => routing needs to be loaded after loading modules
-      self::service()
+      $this->serviceContainer
         ->get('routing')
         ->build();
       // Initialize modules
       // - this will load config
       // - config can update routing
-      //  => routing needs to be loaded before initializing modules
-      self::service()
+      //  => routing needs to be build before initializing modules,
+      //     so optional routing config can be properly validated.
+      $this->serviceContainer
         ->get('modules')
         ->init();
       // Update Routing from config
-      self::service()
+      $this->serviceContainer
         ->get('routing')
         ->update();
+      // Connect to db
+      $this->serviceContainer
+        ->get('db')
+        ->connect();
       //
     } catch (Throwable $ex) {
       /** @todo add message to php-error list */
+      if ($this->inDevelopment()) {
+        var_dump($ex->getTrace());
+      }
       throw $ex;
     }
 
     return $this;
   }
+
   /**
    * Handles the application output.
    * @return $this
@@ -139,11 +149,11 @@ class App {
     // Create matcher
     $matcher = new UrlMatcher(Routing::get()->routes(), new RequestContext());
     // Subscribe a route listener to the events
-    self::event()
+    $this->serviceContainer->get('events')
       ->addSubscriber(new RouterListener($matcher, new RequestStack()));
     // Create kernel object
     $kernel = new HttpKernel(
-      self::event(), new ControllerResolver(), new RequestStack(), new ArgumentResolver()
+      $this->serviceContainer->get('events'), new ControllerResolver(), new RequestStack(), new ArgumentResolver()
     );
 
     $response = $kernel->handle($request);
@@ -157,6 +167,9 @@ class App {
   /**
    * Make application services directly available,
    * through the application from anywhere.
+   * This loads all fully independent services.
+   * The database service is dependant on config service
+   * and needs to be loaded separate later.
    * Use App::service() to access any service,
    * or use App::event() as alias to access the events service.
    */
@@ -179,7 +192,9 @@ class App {
     $this->serviceContainer
       ->register('events', 'Symfony\Component\EventDispatcher\EventDispatcher');
     // Database
-    //
+    $this->serviceContainer
+      ->register('db')
+      ->setFactory('MyTravel\Core\Controller\Db::setService');
   }
 
   /**
@@ -252,9 +267,7 @@ class App {
   }
 
   /**
-   * Get the basepath.
-   * Pretty much redundant. A joke!
-   * Just use Config::get()->basepath instead.
+   * Alias for Config::get()->basepath
    * @return string
    */
   public function basePath() {

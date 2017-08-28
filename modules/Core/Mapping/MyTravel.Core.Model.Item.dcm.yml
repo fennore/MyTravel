@@ -1,0 +1,40 @@
+MyTravel\Core\Model\Item:
+  type: entity
+  table: item
+  id:
+    id:
+      type: bigint
+      generator:
+        strategy: AUTO
+  inheritanceType: SINGLE_TABLE
+  discriminatorColumn:
+    name: type
+    type: string
+  manyToMany:
+    link:
+      targetEntity: MyTravel\Core\Model\Item
+      joinTable:
+        name: itemlink
+        joinColumns:
+          itemid1:
+            referencedColumnName: id
+        inverseJoinColumns:
+          itemid2:
+            referencedColumnName: id
+  fields:
+    status:
+      type: smallint
+      unsigned: true
+    weight:
+      type: integer
+      unsigned: true
+    timestamp:
+      type: integer
+      unsigned: true
+    path:
+    title:
+    content:
+      type: text
+  indexes:
+    basic_select:
+      columns: [ status, timestamp, weight ]

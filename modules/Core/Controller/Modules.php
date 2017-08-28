@@ -59,6 +59,10 @@ final class Modules implements ServiceFactoryInterface {
     return $this;
   }
 
+  public function all() {
+    return $this->modules;
+  }
+
   /**
    * Crawls the modules directory looking for valid modules.
    * A valid module has a map with the module name under the modules directory.
