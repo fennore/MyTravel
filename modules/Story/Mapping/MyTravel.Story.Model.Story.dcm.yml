@@ -1,0 +1,3 @@
+MyTravel\Story\Model\Story:
+  type: entity
+  table: story
