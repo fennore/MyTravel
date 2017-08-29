@@ -127,11 +127,11 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     public function getAlterTableSQL(TableDiff $diff)
     {
-        $sql          = [];
-        $columnSql    = [];
-        $commentsSQL  = [];
-        $tableSql     = [];
-        $alterClauses = [];
+        $sql          = array();
+        $columnSql    = array();
+        $commentsSQL  = array();
+        $tableSql     = array();
+        $alterClauses = array();
 
         /** @var \Doctrine\DBAL\Schema\Column $column */
         foreach ($diff->addedColumns as $column) {
@@ -303,8 +303,6 @@ class SQLAnywherePlatform extends AbstractPlatform
 
             return $columnAlterationClause;
         }
-
-        return null;
     }
 
     /**
@@ -1223,10 +1221,10 @@ class SQLAnywherePlatform extends AbstractPlatform
     /**
      * {@inheritdoc}
      */
-    protected function _getCreateTableSQL($tableName, array $columns, array $options = [])
+    protected function _getCreateTableSQL($tableName, array $columns, array $options = array())
     {
         $columnListSql = $this->getColumnDeclarationListSQL($columns);
-        $indexSql = [];
+        $indexSql = array();
 
         if ( ! empty($options['uniqueConstraints'])) {
             foreach ((array) $options['uniqueConstraints'] as $name => $definition) {
@@ -1266,7 +1264,7 @@ class SQLAnywherePlatform extends AbstractPlatform
 
         $query .= ')';
 
-        return array_merge([$query], $indexSql);
+        return array_merge(array($query), $indexSql);
     }
 
     /**
@@ -1421,9 +1419,9 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     protected function getRenameIndexSQL($oldIndexName, Index $index, $tableName)
     {
-        return [
+        return array(
             'ALTER INDEX ' . $oldIndexName . ' ON ' . $tableName . ' RENAME TO ' . $index->getQuotedName($this)
-        ];
+        );
     }
 
     /**
@@ -1449,7 +1447,7 @@ class SQLAnywherePlatform extends AbstractPlatform
      */
     protected function initializeDoctrineTypeMappings()
     {
-        $this->doctrineTypeMapping = [
+        $this->doctrineTypeMapping = array(
             'char' => 'string',
             'long nvarchar' => 'text',
             'long varchar' => 'text',
@@ -1488,6 +1486,6 @@ class SQLAnywherePlatform extends AbstractPlatform
             'long binary' => 'blob',
             'uniqueidentifier' => 'guid',
             'varbinary' => 'binary',
-        ];
+        );
     }
 }

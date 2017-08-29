@@ -44,12 +44,12 @@ class SQLAnywhere11Keywords extends SQLAnywhereKeywords
         return array_merge(
             array_diff(
                 parent::getKeywords(),
-                ['IQ']
+                array('IQ')
             ),
-            [
+            array(
                 'MERGE',
                 'OPENSTRING'
-            ]
+            )
         );
     }
 }

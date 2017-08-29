@@ -87,7 +87,7 @@ EOT
                 $output->writeln('');
             }
 
-            ++$exit;
+            $exit += 1;
         } else {
             $output->writeln('<info>[Mapping]  OK - The mapping files are correct.</info>');
         }

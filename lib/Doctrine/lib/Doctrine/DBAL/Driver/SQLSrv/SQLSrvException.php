@@ -29,7 +29,7 @@ class SQLSrvException extends AbstractDriverException
      *
      * @return \Doctrine\DBAL\Driver\SQLSrv\SQLSrvException
      */
-    public static function fromSqlSrvErrors()
+    static public function fromSqlSrvErrors()
     {
         $errors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
         $message = "";

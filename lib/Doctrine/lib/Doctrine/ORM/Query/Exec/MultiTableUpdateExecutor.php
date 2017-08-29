@@ -21,9 +21,9 @@ namespace Doctrine\ORM\Query\Exec;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+
 use Doctrine\ORM\Query\ParameterTypeInferer;
 use Doctrine\ORM\Query\AST;
-use Doctrine\ORM\Utility\PersisterHelper;
 
 /**
  * Executes the SQL statements for bulk DQL UPDATE statements on classes in
@@ -52,7 +52,7 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
     /**
      * @var array
      */
-    private $_sqlParameters = [];
+    private $_sqlParameters = array();
 
     /**
      * @var int
@@ -92,7 +92,7 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
                 . ' SELECT t0.' . implode(', t0.', $idColumnNames);
 
         $rangeDecl = new AST\RangeVariableDeclaration($primaryClass->name, $updateClause->aliasIdentificationVariable);
-        $fromClause = new AST\FromClause([new AST\IdentificationVariableDeclaration($rangeDecl, null, [])]);
+        $fromClause = new AST\FromClause(array(new AST\IdentificationVariableDeclaration($rangeDecl, null, array())));
 
         $this->_insertSql .= $sqlWalker->walkFromClause($fromClause);
 
@@ -100,7 +100,7 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
         $idSubselect = 'SELECT ' . $idColumnList . ' FROM ' . $tempTable;
 
         // 3. Create and store UPDATE statements
-        $classNames = array_merge($primaryClass->parentClasses, [$primaryClass->name], $primaryClass->subClasses);
+        $classNames = array_merge($primaryClass->parentClasses, array($primaryClass->name), $primaryClass->subClasses);
         $i = -1;
 
         foreach (array_reverse($classNames) as $className) {
@@ -111,8 +111,8 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
             foreach ($updateItems as $updateItem) {
                 $field = $updateItem->pathExpression->field;
 
-                if ((isset($class->fieldMappings[$field]) && ! isset($class->fieldMappings[$field]['inherited'])) ||
-                    (isset($class->associationMappings[$field]) && ! isset($class->associationMappings[$field]['inherited']))) {
+                if (isset($class->fieldMappings[$field]) && ! isset($class->fieldMappings[$field]['inherited']) ||
+                    isset($class->associationMappings[$field]) && ! isset($class->associationMappings[$field]['inherited'])) {
                     $newValue = $updateItem->newValue;
 
                     if ( ! $affected) {
@@ -143,13 +143,13 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
         }
 
         // 4. Store DDL for temporary identifier table.
-        $columnDefinitions = [];
+        $columnDefinitions = array();
 
         foreach ($idColumnNames as $idColumnName) {
-            $columnDefinitions[$idColumnName] = [
+            $columnDefinitions[$idColumnName] = array(
                 'notnull' => true,
-                'type'    => Type::getType(PersisterHelper::getTypeOfColumn($idColumnName, $rootClass, $em)),
-            ];
+                'type' => Type::getType($rootClass->getTypeOfColumn($idColumnName))
+            );
         }
 
         $this->_createTempTableSql = $platform->getCreateTemporaryTableSnippetSQL() . ' ' . $tempTable . ' ('
@@ -163,6 +163,8 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
      */
     public function execute(Connection $conn, array $params, array $types)
     {
+        $numUpdated = 0;
+
         // Create temporary id table
         $conn->executeUpdate($this->_createTempTableSql);
 
@@ -176,8 +178,8 @@ class MultiTableUpdateExecutor extends AbstractSqlExecutor
 
             // Execute UPDATE statements
             foreach ($this->_sqlStatements as $key => $statement) {
-                $paramValues = [];
-                $paramTypes  = [];
+                $paramValues = array();
+                $paramTypes  = array();
 
                 if (isset($this->_sqlParameters[$key])) {
                     foreach ($this->_sqlParameters[$key] as $parameterKey => $parameterName) {

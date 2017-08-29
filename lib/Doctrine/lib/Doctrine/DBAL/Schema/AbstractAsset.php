@@ -167,7 +167,7 @@ abstract class AbstractAsset
      */
     protected function trimQuotes($identifier)
     {
-        return str_replace(['`', '"', '[', ']'], '', $identifier);
+        return str_replace(array('`', '"', '[', ']'), '', $identifier);
     }
 
     /**

@@ -142,7 +142,7 @@ class DrizzlePlatform extends AbstractPlatform
      */
     protected function initializeDoctrineTypeMappings()
     {
-        $this->doctrineTypeMapping = [
+        $this->doctrineTypeMapping = array(
             'boolean'       => 'boolean',
             'varchar'       => 'string',
             'varbinary'     => 'binary',
@@ -156,7 +156,7 @@ class DrizzlePlatform extends AbstractPlatform
             'timestamp'     => 'datetime',
             'double'        => 'float',
             'bigint'        => 'bigint',
-        ];
+        );
     }
 
     /**
@@ -194,7 +194,7 @@ class DrizzlePlatform extends AbstractPlatform
     /**
      * {@inheritDoc}
      */
-    protected function _getCreateTableSQL($tableName, array $columns, array $options = [])
+    protected function _getCreateTableSQL($tableName, array $columns, array $options = array())
     {
         $queryFields = $this->getColumnDeclarationListSQL($columns);
 
@@ -251,7 +251,7 @@ class DrizzlePlatform extends AbstractPlatform
             return $options['table_options'];
         }
 
-        $tableOptions = [];
+        $tableOptions = array();
 
         // Collate
         if ( ! isset($options['collate'])) {
@@ -483,8 +483,8 @@ class DrizzlePlatform extends AbstractPlatform
      */
     public function getAlterTableSQL(TableDiff $diff)
     {
-        $columnSql = [];
-        $queryParts = [];
+        $columnSql = array();
+        $queryParts = array();
 
         if ($diff->newName !== false) {
             $queryParts[] =  'RENAME TO ' . $diff->getNewName()->getQuotedName($this);
@@ -545,8 +545,8 @@ class DrizzlePlatform extends AbstractPlatform
                     . $this->getColumnDeclarationSQL($column->getQuotedName($this), $columnArray);
         }
 
-        $sql = [];
-        $tableSql = [];
+        $sql = array();
+        $tableSql = array();
 
         if ( ! $this->onSchemaAlterTable($diff, $tableSql)) {
             if (count($queryParts) > 0) {

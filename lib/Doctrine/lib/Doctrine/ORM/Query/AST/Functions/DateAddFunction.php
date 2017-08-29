@@ -27,7 +27,7 @@ use Doctrine\ORM\Query\QueryException;
 /**
  * "DATE_ADD" "(" ArithmeticPrimary "," ArithmeticPrimary "," StringPrimary ")"
  *
- *
+ * 
  * @link    www.doctrine-project.org
  * @since   2.0
  * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
@@ -41,7 +41,6 @@ class DateAddFunction extends FunctionNode
 
     /**
      * @override
-     * @inheritdoc
      */
     public function getSql(SqlWalker $sqlWalker)
     {
@@ -78,7 +77,6 @@ class DateAddFunction extends FunctionNode
 
     /**
      * @override
-     * @inheritdoc
      */
     public function parse(Parser $parser)
     {

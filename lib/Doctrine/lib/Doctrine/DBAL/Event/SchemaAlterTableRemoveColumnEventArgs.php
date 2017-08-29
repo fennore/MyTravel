@@ -50,7 +50,7 @@ class SchemaAlterTableRemoveColumnEventArgs extends SchemaEventArgs
     /**
      * @var array
      */
-    private $_sql = [];
+    private $_sql = array();
 
     /**
      * @param \Doctrine\DBAL\Schema\Column              $column

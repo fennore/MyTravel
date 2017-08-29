@@ -183,10 +183,10 @@ class SQLAzureFederationsSynchronizer extends AbstractSchemaSynchronizer
      */
     private function partitionSchema(Schema $schema)
     {
-        return [
+        return array(
             $this->extractSchemaFederation($schema, false),
             $this->extractSchemaFederation($schema, true),
-        ];
+        );
     }
 
     /**

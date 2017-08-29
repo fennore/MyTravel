@@ -32,12 +32,12 @@ class ReservedKeywordsValidator implements Visitor
     /**
      * @var KeywordList[]
      */
-    private $keywordLists = [];
+    private $keywordLists = array();
 
     /**
      * @var array
      */
-    private $violations = [];
+    private $violations = array();
 
     /**
      * @param \Doctrine\DBAL\Platforms\Keywords\KeywordList[] $keywordLists
@@ -66,7 +66,7 @@ class ReservedKeywordsValidator implements Visitor
             $word = str_replace('`', '', $word);
         }
 
-        $keywordLists = [];
+        $keywordLists = array();
         foreach ($this->keywordLists as $keywordList) {
             if ($keywordList->isKeyword($word)) {
                 $keywordLists[] = $keywordList->getName();

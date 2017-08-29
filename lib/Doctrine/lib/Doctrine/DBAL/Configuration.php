@@ -40,7 +40,7 @@ class Configuration
      *
      * @var array
      */
-    protected $_attributes = [];
+    protected $_attributes = array();
 
     /**
      * Sets the SQL logger to use. Defaults to NULL which means SQL logging is disabled.

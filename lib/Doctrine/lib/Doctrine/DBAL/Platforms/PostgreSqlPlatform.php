@@ -47,24 +47,24 @@ class PostgreSqlPlatform extends AbstractPlatform
     /**
      * @var array PostgreSQL booleans literals
      */
-    private $booleanLiterals = [
-        'true' => [
+    private $booleanLiterals = array(
+        'true' => array(
             't',
             'true',
             'y',
             'yes',
             'on',
             '1'
-        ],
-        'false' => [
+        ),
+        'false' => array(
             'f',
             'false',
             'n',
             'no',
             'off',
             '0'
-        ]
-    ];
+        )
+    );
 
     /**
      * PostgreSQL has different behavior with some drivers
@@ -486,9 +486,9 @@ class PostgreSqlPlatform extends AbstractPlatform
      */
     public function getAlterTableSQL(TableDiff $diff)
     {
-        $sql = [];
-        $commentsSQL = [];
-        $columnSql = [];
+        $sql = array();
+        $commentsSQL = array();
+        $columnSql = array();
 
         foreach ($diff->addedColumns as $column) {
             if ($this->onSchemaAlterTableAddColumn($column, $diff, $columnSql)) {
@@ -593,7 +593,7 @@ class PostgreSqlPlatform extends AbstractPlatform
                 ' RENAME COLUMN ' . $oldColumnName->getQuotedName($this) . ' TO ' . $column->getQuotedName($this);
         }
 
-        $tableSql = [];
+        $tableSql = array();
 
         if ( ! $this->onSchemaAlterTable($diff, $tableSql)) {
             $sql = array_merge($sql, $commentsSQL);
@@ -643,14 +643,14 @@ class PostgreSqlPlatform extends AbstractPlatform
                 return false;
             }
 
-            return count(array_diff($columnDiff->changedProperties, ['type', 'length', 'fixed'])) === 0;
+            return count(array_diff($columnDiff->changedProperties, array('type', 'length', 'fixed'))) === 0;
         }
 
         if ($columnDiff->hasChanged('type')) {
             return false;
         }
 
-        return count(array_diff($columnDiff->changedProperties, ['length', 'fixed'])) === 0;
+        return count(array_diff($columnDiff->changedProperties, array('length', 'fixed'))) === 0;
     }
 
     /**
@@ -663,7 +663,7 @@ class PostgreSqlPlatform extends AbstractPlatform
             $oldIndexName = $schema . '.' . $oldIndexName;
         }
 
-        return ['ALTER INDEX ' . $oldIndexName . ' RENAME TO ' . $index->getQuotedName($this)];
+        return array('ALTER INDEX ' . $oldIndexName . ' RENAME TO ' . $index->getQuotedName($this));
     }
 
     /**
@@ -748,7 +748,7 @@ class PostgreSqlPlatform extends AbstractPlatform
     /**
      * {@inheritDoc}
      */
-    protected function _getCreateTableSQL($tableName, array $columns, array $options = [])
+    protected function _getCreateTableSQL($tableName, array $columns, array $options = array())
     {
         $queryFields = $this->getColumnDeclarationListSQL($columns);
 
@@ -1094,7 +1094,7 @@ class PostgreSqlPlatform extends AbstractPlatform
      */
     protected function initializeDoctrineTypeMappings()
     {
-        $this->doctrineTypeMapping = [
+        $this->doctrineTypeMapping = array(
             'smallint'      => 'smallint',
             'int2'          => 'smallint',
             'serial'        => 'integer',
@@ -1134,7 +1134,7 @@ class PostgreSqlPlatform extends AbstractPlatform
             'year'          => 'date',
             'uuid'          => 'guid',
             'bytea'         => 'blob',
-        ];
+        );
     }
 
     /**

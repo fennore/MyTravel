@@ -55,7 +55,7 @@ class SchemaAlterTableRenameColumnEventArgs extends SchemaEventArgs
     /**
      * @var array
      */
-    private $_sql = [];
+    private $_sql = array();
 
     /**
      * @param string                                    $oldColumnName

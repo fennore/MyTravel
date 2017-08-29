@@ -57,7 +57,7 @@ class SimpleArrayType extends Type
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         if ($value === null) {
-            return [];
+            return array();
         }
 
         $value = (is_resource($value)) ? stream_get_contents($value) : $value;

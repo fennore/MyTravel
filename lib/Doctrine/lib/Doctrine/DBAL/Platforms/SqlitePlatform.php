@@ -315,7 +315,7 @@ class SqlitePlatform extends AbstractPlatform
     /**
      * {@inheritDoc}
      */
-    protected function _getCreateTableSQL($name, array $columns, array $options = [])
+    protected function _getCreateTableSQL($name, array $columns, array $options = array())
     {
         $name = str_replace('.', '__', $name);
         $queryFields = $this->getColumnDeclarationListSQL($columns);
@@ -529,7 +529,7 @@ class SqlitePlatform extends AbstractPlatform
      *
      * @return float
      */
-    public static function udfSqrt($value)
+    static public function udfSqrt($value)
     {
         return sqrt($value);
     }
@@ -542,7 +542,7 @@ class SqlitePlatform extends AbstractPlatform
      *
      * @return integer
      */
-    public static function udfMod($a, $b)
+    static public function udfMod($a, $b)
     {
         return ($a % $b);
     }
@@ -554,7 +554,7 @@ class SqlitePlatform extends AbstractPlatform
      *
      * @return integer
      */
-    public static function udfLocate($str, $substr, $offset = 0)
+    static public function udfLocate($str, $substr, $offset = 0)
     {
         // SQL's LOCATE function works on 1-based positions, while PHP's strpos works on 0-based positions.
         // So we have to make them compatible if an offset is given.
@@ -592,7 +592,7 @@ class SqlitePlatform extends AbstractPlatform
      */
     protected function initializeDoctrineTypeMappings()
     {
-        $this->doctrineTypeMapping = [
+        $this->doctrineTypeMapping = array(
             'boolean'          => 'boolean',
             'tinyint'          => 'boolean',
             'smallint'         => 'smallint',
@@ -625,7 +625,7 @@ class SqlitePlatform extends AbstractPlatform
             'decimal'          => 'decimal',
             'numeric'          => 'decimal',
             'blob'             => 'blob',
-        ];
+        );
     }
 
     /**
@@ -645,7 +645,7 @@ class SqlitePlatform extends AbstractPlatform
             throw new DBALException('Sqlite platform requires for alter table the table diff with reference to original table schema');
         }
 
-        $sql = [];
+        $sql = array();
         foreach ($diff->fromTable->getIndexes() as $index) {
             if ( ! $index->isPrimary()) {
                 $sql[] = $this->getDropIndexSQL($index, $diff->name);
@@ -664,7 +664,7 @@ class SqlitePlatform extends AbstractPlatform
             throw new DBALException('Sqlite platform requires for alter table the table diff with reference to original table schema');
         }
 
-        $sql = [];
+        $sql = array();
         $tableName = $diff->newName ? $diff->getNewName(): $diff->getName($this);
         foreach ($this->getIndexesInAlteredTable($diff) as $index) {
             if ($index->isPrimary()) {
@@ -799,10 +799,10 @@ class SqlitePlatform extends AbstractPlatform
 
         $table = clone $fromTable;
 
-        $columns = [];
-        $oldColumnNames = [];
-        $newColumnNames = [];
-        $columnSql = [];
+        $columns = array();
+        $oldColumnNames = array();
+        $newColumnNames = array();
+        $columnSql = array();
 
         foreach ($table->getColumns() as $columnName => $column) {
             $columnName = strtolower($columnName);
@@ -864,8 +864,8 @@ class SqlitePlatform extends AbstractPlatform
             $columns[strtolower($columnName)] = $column;
         }
 
-        $sql = [];
-        $tableSql = [];
+        $sql = array();
+        $tableSql = array();
         if ( ! $this->onSchemaAlterTable($diff, $tableSql)) {
             $dataTable = new Table('__temp__'.$table->getName());
 
@@ -932,16 +932,16 @@ class SqlitePlatform extends AbstractPlatform
 
         $table = new Table($diff->name);
 
-        $sql = [];
-        $tableSql = [];
-        $columnSql = [];
+        $sql = array();
+        $tableSql = array();
+        $columnSql = array();
 
         foreach ($diff->addedColumns as $column) {
             if ($this->onSchemaAlterTableAddColumn($column, $diff, $columnSql)) {
                 continue;
             }
 
-            $field = array_merge(['unique' => null, 'autoincrement' => null, 'default' => null], $column->toArray());
+            $field = array_merge(array('unique' => null, 'autoincrement' => null, 'default' => null), $column->toArray());
             $type = (string) $field['type'];
             switch (true) {
                 case isset($field['columnDefinition']) || $field['autoincrement'] || $field['unique']:
@@ -976,7 +976,7 @@ class SqlitePlatform extends AbstractPlatform
      */
     private function getColumnNamesInAlteredTable(TableDiff $diff)
     {
-        $columns = [];
+        $columns = array();
 
         foreach ($diff->fromTable->getColumns() as $columnName => $column) {
             $columns[strtolower($columnName)] = $column->getName();
@@ -1026,7 +1026,7 @@ class SqlitePlatform extends AbstractPlatform
             }
 
             $changed = false;
-            $indexColumns = [];
+            $indexColumns = array();
             foreach ($index->getColumns() as $columnName) {
                 $normalizedColumnName = strtolower($columnName);
                 if ( ! isset($columnNames[$normalizedColumnName])) {
@@ -1076,7 +1076,7 @@ class SqlitePlatform extends AbstractPlatform
 
         foreach ($foreignKeys as $key => $constraint) {
             $changed = false;
-            $localColumns = [];
+            $localColumns = array();
             foreach ($constraint->getLocalColumns() as $columnName) {
                 $normalizedColumnName = strtolower($columnName);
                 if ( ! isset($columnNames[$normalizedColumnName])) {
@@ -1121,11 +1121,11 @@ class SqlitePlatform extends AbstractPlatform
      */
     private function getPrimaryIndexInAlteredTable(TableDiff $diff)
     {
-        $primaryIndex = [];
+        $primaryIndex = array();
 
         foreach ($this->getIndexesInAlteredTable($diff) as $index) {
             if ($index->isPrimary()) {
-                $primaryIndex = [$index->getName() => $index];
+                $primaryIndex = array($index->getName() => $index);
             }
         }
 

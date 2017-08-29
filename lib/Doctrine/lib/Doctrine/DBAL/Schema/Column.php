@@ -78,7 +78,7 @@ class Column extends AbstractAsset
     /**
      * @var array
      */
-    protected $_platformOptions = [];
+    protected $_platformOptions = array();
 
     /**
      * @var string|null
@@ -93,7 +93,7 @@ class Column extends AbstractAsset
     /**
      * @var array
      */
-    protected $_customSchemaOptions = [];
+    protected $_customSchemaOptions = array();
 
     /**
      * Creates a new Column.
@@ -102,7 +102,7 @@ class Column extends AbstractAsset
      * @param Type   $type
      * @param array  $options
      */
-    public function __construct($columnName, Type $type, array $options=[])
+    public function __construct($columnName, Type $type, array $options=array())
     {
         $this->_setName($columnName);
         $this->setType($type);
@@ -469,7 +469,7 @@ class Column extends AbstractAsset
      */
     public function toArray()
     {
-        return array_merge([
+        return array_merge(array(
             'name'          => $this->_name,
             'type'          => $this->_type,
             'default'       => $this->_default,
@@ -482,6 +482,6 @@ class Column extends AbstractAsset
             'autoincrement' => $this->_autoincrement,
             'columnDefinition' => $this->_columnDefinition,
             'comment' => $this->_comment,
-        ], $this->_platformOptions, $this->_customSchemaOptions);
+        ), $this->_platformOptions, $this->_customSchemaOptions);
     }
 }

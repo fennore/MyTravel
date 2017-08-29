@@ -81,14 +81,14 @@ EOT
     {
         $table = new Table($output);
 
-        $table->setHeaders(['Field', 'Value']);
+        $table->setHeaders(array('Field', 'Value'));
 
         $metadata = $this->getClassMetadata($entityName, $entityManager);
 
         array_map(
-            [$table, 'addRow'],
+            array($table, 'addRow'),
             array_merge(
-                [
+                array(
                     $this->formatField('Name', $metadata->name),
                     $this->formatField('Root entity name', $metadata->rootEntityName),
                     $this->formatField('Custom generator definition', $metadata->customGeneratorDefinition),
@@ -118,10 +118,10 @@ EOT
                     $this->formatField('Read only?', $metadata->isReadOnly),
 
                     $this->formatEntityListeners($metadata->entityListeners),
-                ],
-                [$this->formatField('Association mappings:', '')],
+                ),
+                array($this->formatField('Association mappings:', '')),
                 $this->formatMappings($metadata->associationMappings),
-                [$this->formatField('Field mappings:', '')],
+                array($this->formatField('Field mappings:', '')),
                 $this->formatMappings($metadata->fieldMappings)
             )
         );
@@ -185,7 +185,7 @@ EOT
 
         if (count($matches) > 1) {
             throw new \InvalidArgumentException(sprintf(
-                'Entity name "%s" is ambiguous, possible matches: "%s"',
+                'Entity name "%s" is ambigous, possible matches: "%s"',
                 $entityName, implode(', ', $matches)
             ));
         }
@@ -251,19 +251,19 @@ EOT
             $value = '<comment>None</comment>';
         }
 
-        return [sprintf('<info>%s</info>', $label), $this->formatValue($value)];
+        return array(sprintf('<info>%s</info>', $label), $this->formatValue($value));
     }
 
     /**
      * Format the association mappings
      *
-     * @param array $propertyMappings
+     * @param array
      *
      * @return array
      */
     private function formatMappings(array $propertyMappings)
     {
-        $output = [];
+        $output = array();
 
         foreach ($propertyMappings as $propertyName => $mapping) {
             $output[] = $this->formatField(sprintf('  %s', $propertyName), '');

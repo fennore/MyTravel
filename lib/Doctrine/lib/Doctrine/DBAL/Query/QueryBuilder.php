@@ -420,7 +420,7 @@ class QueryBuilder
         $isMultiple = is_array($this->sqlParts[$sqlPartName]);
 
         if ($isMultiple && !$isArray) {
-            $sqlPart = [$sqlPart];
+            $sqlPart = array($sqlPart);
         }
 
         $this->state = self::STATE_DIRTY;
@@ -540,7 +540,7 @@ class QueryBuilder
      * <code>
      *     $qb = $conn->createQueryBuilder()
      *         ->update('users', 'u')
-     *         ->set('u.last_login', 'NOW()')
+     *         ->set('u.password', md5('password'))
      *         ->where('u.id = ?');
      * </code>
      *
@@ -733,7 +733,7 @@ class QueryBuilder
      * <code>
      *     $qb = $conn->createQueryBuilder()
      *         ->update('users', 'u')
-     *         ->set('u.last_login', 'NOW()')
+     *         ->set('u.password', md5('password'))
      *         ->where('u.id = ?');
      * </code>
      *
@@ -765,7 +765,7 @@ class QueryBuilder
      *     $or->add($qb->expr()->eq('u.id', 2));
      *
      *     $qb->update('users', 'u')
-     *         ->set('u.last_login', 'NOW()')
+     *         ->set('u.password', md5('password'))
      *         ->where($or);
      * </code>
      *
@@ -1093,7 +1093,7 @@ class QueryBuilder
     public function resetQueryPart($queryPartName)
     {
         $this->sqlParts[$queryPartName] = is_array($this->sqlParts[$queryPartName])
-            ? [] : null;
+            ? array() : null;
 
         $this->state = self::STATE_DIRTY;
 
@@ -1131,8 +1131,8 @@ class QueryBuilder
      */
     private function getFromClauses()
     {
-        $fromClauses = [];
-        $knownAliases = [];
+        $fromClauses = array();
+        $knownAliases = array();
 
         // Loop through all FROM clauses
         foreach ($this->sqlParts['from'] as $from) {

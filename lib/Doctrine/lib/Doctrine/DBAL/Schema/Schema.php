@@ -60,17 +60,17 @@ class Schema extends AbstractAsset
      *
      * @var array
      */
-    private $namespaces = [];
+    private $namespaces = array();
 
     /**
      * @var \Doctrine\DBAL\Schema\Table[]
      */
-    protected $_tables = [];
+    protected $_tables = array();
 
     /**
      * @var \Doctrine\DBAL\Schema\Sequence[]
      */
-    protected $_sequences = [];
+    protected $_sequences = array();
 
     /**
      * @var \Doctrine\DBAL\Schema\SchemaConfig
@@ -84,10 +84,10 @@ class Schema extends AbstractAsset
      * @param array                              $namespaces
      */
     public function __construct(
-        array $tables = [],
-        array $sequences = [],
+        array $tables = array(),
+        array $sequences = array(),
         SchemaConfig $schemaConfig = null,
-        array $namespaces = []
+        array $namespaces = array()
     ) {
         if ($schemaConfig == null) {
             $schemaConfig = new SchemaConfig();

@@ -46,19 +46,17 @@ class GenerateRepositoriesCommand extends Command
     {
         $this
         ->setName('orm:generate-repositories')
-        ->setAliases(['orm:generate:repositories'])
+        ->setAliases(array('orm:generate:repositories'))
         ->setDescription('Generate repository classes from your mapping information.')
-        ->setDefinition(
-            [
-                new InputOption(
-                    'filter', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                    'A string pattern used to match entities that should be processed.'
-                ),
-                new InputArgument(
-                    'dest-path', InputArgument::REQUIRED, 'The path to generate your repository classes.'
-                )
-            ]
-        )
+        ->setDefinition(array(
+            new InputOption(
+                'filter', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'A string pattern used to match entities that should be processed.'
+            ),
+            new InputArgument(
+                'dest-path', InputArgument::REQUIRED, 'The path to generate your repository classes.'
+            )
+        ))
         ->setHelp(<<<EOT
 Generate repository classes from your mapping information.
 EOT
@@ -112,12 +110,12 @@ EOT
 
             if ($numRepositories) {
                 // Outputting information message
-                $output->writeln(PHP_EOL . sprintf('Repository classes generated to "<info>%s</INFO>"', $destPath));
+                $output->writeln(PHP_EOL . sprintf('Repository classes generated to "<info>%s</INFO>"', $destPath) );
             } else {
-                $output->writeln('No Repository classes were found to be processed.');
+                $output->writeln('No Repository classes were found to be processed.' );
             }
         } else {
-            $output->writeln('No Metadata Classes to process.');
+            $output->writeln('No Metadata Classes to process.' );
         }
     }
 }

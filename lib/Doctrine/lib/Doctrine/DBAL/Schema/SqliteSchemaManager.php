@@ -52,10 +52,10 @@ class SqliteSchemaManager extends AbstractSchemaManager
     {
         $params = $this->_conn->getParams();
         $driver = $params['driver'];
-        $options = [
+        $options = array(
             'driver' => $driver,
             'path' => $database
-        ];
+        );
         $conn = \Doctrine\DBAL\DriverManager::getConnection($options);
         $conn->connect();
         $conn->close();
@@ -135,7 +135,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
                 $deferrable = array_reverse($match[2]);
                 $deferred = array_reverse($match[3]);
             } else {
-                $names = $deferrable = $deferred = [];
+                $names = $deferrable = $deferred = array();
             }
 
             foreach ($tableForeignKeys as $key => $value) {
@@ -165,7 +165,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
      */
     protected function _getPortableTableIndexesList($tableIndexes, $tableName=null)
     {
-        $indexBuffer = [];
+        $indexBuffer = array();
 
         // fetch primary
         $stmt = $this->_conn->executeQuery("PRAGMA TABLE_INFO ('$tableName')");
@@ -180,12 +180,12 @@ class SqliteSchemaManager extends AbstractSchemaManager
         });
         foreach ($indexArray as $indexColumnRow) {
             if ($indexColumnRow['pk'] != "0") {
-                $indexBuffer[] = [
+                $indexBuffer[] = array(
                     'key_name' => 'primary',
                     'primary' => true,
                     'non_unique' => false,
                     'column_name' => $indexColumnRow['name']
-                ];
+                );
             }
         }
 
@@ -194,7 +194,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
             // Ignore indexes with reserved names, e.g. autoindexes
             if (strpos($tableIndex['name'], 'sqlite_') !== 0) {
                 $keyName = $tableIndex['name'];
-                $idx = [];
+                $idx = array();
                 $idx['key_name'] = $keyName;
                 $idx['primary'] = false;
                 $idx['non_unique'] = $tableIndex['unique']?false:true;
@@ -217,10 +217,10 @@ class SqliteSchemaManager extends AbstractSchemaManager
      */
     protected function _getPortableTableIndexDefinition($tableIndex)
     {
-        return [
+        return array(
             'name' => $tableIndex['name'],
             'unique' => (bool) $tableIndex['unique']
-        ];
+        );
     }
 
     /**
@@ -339,7 +339,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
                 break;
         }
 
-        $options = [
+        $options = array(
             'length'   => $length,
             'unsigned' => (bool) $unsigned,
             'fixed'    => $fixed,
@@ -348,7 +348,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
             'precision' => $precision,
             'scale'     => $scale,
             'autoincrement' => false,
-        ];
+        );
 
         return new Column($tableColumn['name'], \Doctrine\DBAL\Types\Type::getType($type), $options);
     }
@@ -366,7 +366,7 @@ class SqliteSchemaManager extends AbstractSchemaManager
      */
     protected function _getPortableTableForeignKeysList($tableForeignKeys)
     {
-        $list = [];
+        $list = array();
         foreach ($tableForeignKeys as $value) {
             $value = array_change_key_case($value, CASE_LOWER);
             $name = $value['constraint_name'];
@@ -378,32 +378,32 @@ class SqliteSchemaManager extends AbstractSchemaManager
                     $value['on_update'] = null;
                 }
 
-                $list[$name] = [
+                $list[$name] = array(
                     'name' => $name,
-                    'local' => [],
-                    'foreign' => [],
+                    'local' => array(),
+                    'foreign' => array(),
                     'foreignTable' => $value['table'],
                     'onDelete' => $value['on_delete'],
                     'onUpdate' => $value['on_update'],
                     'deferrable' => $value['deferrable'],
                     'deferred'=> $value['deferred'],
-                ];
+                );
             }
             $list[$name]['local'][] = $value['from'];
             $list[$name]['foreign'][] = $value['to'];
         }
 
-        $result = [];
+        $result = array();
         foreach ($list as $constraint) {
             $result[] = new ForeignKeyConstraint(
                 array_values($constraint['local']), $constraint['foreignTable'],
                 array_values($constraint['foreign']), $constraint['name'],
-                [
+                array(
                     'onDelete' => $constraint['onDelete'],
                     'onUpdate' => $constraint['onUpdate'],
                     'deferrable' => $constraint['deferrable'],
                     'deferred'=> $constraint['deferred'],
-                ]
+                )
             );
         }
 
