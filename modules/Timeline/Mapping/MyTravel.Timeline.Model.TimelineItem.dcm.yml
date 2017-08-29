@@ -1,0 +1,9 @@
+MyTravel\Timeline\Model\TimelineItem:
+  type: entity
+  table: timelineitem
+  fields:
+    property:
+      type: text
+    setting:
+      type: text
+      
