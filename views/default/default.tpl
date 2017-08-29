@@ -4,7 +4,7 @@
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
     {% block head %}
-      <title>{% block title %}Welcome to the story of my Euro-Turkey bicycle tour!{% endblock %}</title>
+      <title>{% block title %}MyTravel{% endblock %}</title>
     {% endblock %}
   </head>
   <body>
