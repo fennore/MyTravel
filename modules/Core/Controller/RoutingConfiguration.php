@@ -5,7 +5,6 @@ namespace MyTravel\Core\Controller;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use MyTravel\Core\Event\ConfigNodeEvent;
 
 final class RoutingConfiguration implements ConfigurationInterface {
 
@@ -33,7 +32,7 @@ final class RoutingConfiguration implements ConfigurationInterface {
    */
   private function addConfigFromRouting(NodeBuilder $node) {
     // 1. Collect routes
-    $routes = Routing::get()
+      $routes = Routing::get()
       ->routes()
       ->all();
     // 2. Add routes to config

@@ -6,6 +6,8 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\EntityManager;
 use MyTravel\Core\ServiceFactoryInterface;
+use MyTravel\Core\Model\Module;
+use MyTravel\Core\Event\DbServiceEvent;
 
 final class Db implements ServiceFactoryInterface {
 
@@ -33,27 +35,35 @@ final class Db implements ServiceFactoryInterface {
   }
 
   public function connect($name = 'sqlite') {
-    $dbConfig = $this->getConfiguration();
+    $dbConfig = $this->getConfiguration($name);
     $connections = Config::get()->database['connections'];
     $this->connection[$name] = EntityManager::create(
         $connections[$name], $dbConfig
     );
+    // Dispatch event for altering application config node
+    $event = new DbServiceEvent($this->connection[$name]);
+    App::event()
+      ->dispatch('module.service.db.connect', $event);
     $this->sync();
     return $this;
   }
 
   /**
    * Get ORM Config.
-   * @todo figure out how to return one for all modules
-   * (with automatic updates?)
    * @return Doctrine\ORM\Configuration
    */
-  protected function getConfiguration() {
-    // get a schema from yaml file from all modules
+  protected function getConfiguration($name = 'sqlite') {
+    // Get a schema from yaml file from all modules
     $moduleList = Modules::get()->all();
-    $paths = array('./modules/Core/Mapping');
+    // Add Core module to the list
+    array_push($moduleList, new Module('Core'));
     foreach ($moduleList as $module) {
-      $paths[] = './modules/' . $module->name . '';
+      // Mapping for all in root
+      $mappingPath = './modules/' . $module->name . '/Mapping';
+      if (!\is_dir($mappingPath)) {
+        continue;
+      }
+      $paths[] = $mappingPath;
     }
     //
     // see what it returns
@@ -71,26 +81,9 @@ final class Db implements ServiceFactoryInterface {
     $metaDataClassList = $this->connection[$name]
       ->getMetadataFactory()
       ->getAllMetadata();
-    // Get current db schema from connection
-    $fromSchema = $this->connection[$name]
-      ->getConnection()
-      ->getSchemaManager()
-      ->createSchema();
     // Create schema from yml mapping files
     $tool = new SchemaTool($this->connection[$name]);
-    $toSchema = $tool->getSchemaFromMetadata($metaDataClassList);
-    $platform = $this->connection[$name]
-      ->getConnection()
-      ->getDatabasePlatform();
-
-    $sql = $fromSchema->getMigrateToSql(
-      $toSchema, $platform
-    );
-    foreach ($sql as $query) {
-      $this->connection[$name]
-        ->getConnection()
-        ->query($query);
-    }
+    $tool->updateSchema($metaDataClassList, true);
     return $this;
   }
 

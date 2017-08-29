@@ -2,7 +2,8 @@
 
 namespace MyTravel\Core\Model;
 
-class SourceItem {
+class SourceItem extends Item {
+
   private $itemId;
   private $file;
 

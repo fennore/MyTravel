@@ -6,7 +6,7 @@ MyTravel\Core\Model\Item:
       type: bigint
       generator:
         strategy: AUTO
-  inheritanceType: SINGLE_TABLE
+  inheritanceType: JOINED
   discriminatorColumn:
     name: type
     type: string
@@ -36,5 +36,5 @@ MyTravel\Core\Model\Item:
     content:
       type: text
   indexes:
-    basic_select:
+    itemListSelect:
       columns: [ status, timestamp, weight ]

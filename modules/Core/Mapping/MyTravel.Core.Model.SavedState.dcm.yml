@@ -1,0 +1,11 @@
+MyTravel\Core\Model\SavedState:
+  type: entity
+  table: savedstate
+  id:
+    key:
+      type: smallint
+      unsigned: true
+      unique: true
+  fields:
+    state:
+      type: json

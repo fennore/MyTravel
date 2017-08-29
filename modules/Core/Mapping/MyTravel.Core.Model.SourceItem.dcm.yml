@@ -1,8 +1,5 @@
 MyTravel\Core\Model\SourceItem:
-  type: entity
-  id:
-    itemId:
-      type: bigint
+  type: mappedSuperclass
   oneToOne:
     file:
       targetEntity: MyTravel\Core\Model\File
