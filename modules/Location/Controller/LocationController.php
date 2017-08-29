@@ -12,8 +12,8 @@ final class LocationController implements ModuleControllerInterface {
   }
 
   public static function load() {
-    if (!(self::$controller instanceof LocationController)) {
-      self::$controller = new LocationController();
+    if (!(self::$controller instanceof self)) {
+      self::$controller = new self();
     }
     return self::$controller;
   }

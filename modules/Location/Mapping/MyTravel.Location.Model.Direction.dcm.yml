@@ -1,0 +1,23 @@
+MyTravel\Location\Model\Direction:
+  type: entity
+  table: direction
+  id:
+    id:
+      type: bigint
+      generator:
+        strategy: AUTO
+  oneToOne:
+    origin:
+      targetEntity: MyTravel\Location\Model\Location
+      joinColumn:
+        name: origin
+    destination:
+      targetEntity: MyTravel\Location\Model\Location
+      joinColumn:
+        name: destination
+  fields:
+    stage:
+      type: smallint
+      unsigned: true
+    data:
+      type: json

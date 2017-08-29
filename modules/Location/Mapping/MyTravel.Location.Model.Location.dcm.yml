@@ -1,0 +1,29 @@
+MyTravel\Location\Model\Location:
+  type: entity
+  table: location
+  id:
+    id:
+      type: bigint
+      generator:
+        strategy: AUTO
+  embedded:
+    coordinate:
+      class: MyTravel\Location\Model\Coordinate
+      columnPrefix: false
+  fields:
+    info:
+      type: text
+    weight:
+      type: smallint
+      unsigned: true
+    status:
+      type: smallint
+      unsigned: true
+    stage:
+      type: smallint
+      unsigned: true
+  indexes:
+    locationListSelect:
+      columns: [ stage, weight ]
+    locationFilter:
+      columns: [ status ]
