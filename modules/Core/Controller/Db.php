@@ -13,11 +13,19 @@ final class Db implements ServiceFactoryInterface {
 
   protected static $dbServiceController;
   protected $connection;
+  
+  public function __isset($name) {
+    return isset($this->connection[$name]);
+  }
+
+  public function __get($name) {
+    return $this->connection[$name];
+  }
 
   /**
-   * Short alias for App::service()->get('config')->dbConnectionName
+   * Short alias for App::service()->get('db')->dbConnectionName
    * @param string $name database connection name you gave when connecting
-   * @return MyTravel\Core\Controller\Db
+   * @return Doctrine\ORM\EntityManager
    */
   public static function get($name = 'sqlite') {
     return App::service()->get('db')->$name;

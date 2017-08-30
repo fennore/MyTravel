@@ -1,13 +1,15 @@
 <?php
-
+// Please note: you haven't seen all the things you don't like to see.
+// 
 // Initialize application
 require_once './modules/Core/Controller/App.php';
 
 use MyTravel\Core\Controller\App;
 
 $app = App::load();
-// Autoloading
-// @todo one day setup composer then this is no longer needed
+// Autoloading.
+// @todo one day setup composer then this is no longer needed.
+// But we all like independency.
 $app
   ->setAutoloader('psr-4', 'lib/ClassLoader/Psr4ClassLoader.php', 'Symfony\\Component\\ClassLoader\\Psr4ClassLoader')
   ->setAutoloadPrefixes('psr-4', 'addPrefix')

@@ -6,7 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 use MyTravel\Core\Model\Page;
 
 /**
- * @todo should use database and stuff
+ * @todo should use database and stuff.
+ * Rename to PageController when that happens.
+ * This can probably just use item stuff anyway.
+ * And then it can just use Item controller and we can get rid of this eye bleeding stuff.
  */
 class PageFactory {
 

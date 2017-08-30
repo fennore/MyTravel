@@ -32,6 +32,7 @@ MyTravel\Core\Model\Item:
       type: integer
       unsigned: true
     path:
+      unique: true
     title:
     content:
       type: text

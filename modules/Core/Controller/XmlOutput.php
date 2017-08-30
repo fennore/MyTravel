@@ -2,18 +2,53 @@
 
 namespace MyTravel\Core\Controller;
 
+use DOMDocument;
+use DOMElement;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+
 class XmlOutput implements OutputInterface {
-  public function output() {
-    $document = new \DOMDocument("1.0", 'UTF-8');
-    $document->formatOutput = true;
+
+  private $document;
+
+  public function __construct() {
+    $this->document = new DOMDocument("1.0", 'UTF-8');
+    $this->document->formatOutput = true;
   }
+
+  public function output(GetResponseForControllerResultEvent $event) {
+    
+    /**
+     * getChildren
+     * => loop
+     * => $document->appendChild($xml);
+     */
+    return $this->document;
+  }
+
+  /**
+   * Save an XML Document in the files directory
+   * @param DOMElement $childDomTree
+   * @param string $fileLoc location under files directory
+   */
+  public function saveFile(DOMElement $childDomTree, $fileLoc) {
+    /**
+     * getChildren
+     * => loop
+     * => $document->appendChild($xml);
+     */
+    // sprintf('%02d', $stage) . '-stage
+    $this->document->save(Config::get()->directories['files'] . '/' . $fileLoc);
+  }
+
   /**
    *
    * @param type $gpxList
    * @param type $filename
    * @return \DOMDocument
    */
-  public function outputGpx($gpxList, $filename) {
+  private function outputGpx(GetResponseForControllerResultEvent $event) {
+    $gpxlist;
+    $filename;
     $document = new \DOMDocument("1.0", 'UTF-8');
     $document->formatOutput = true;
     $gpx = $document->createElementNS("http://www.topografix.com/GPX/1/0", "gpx");

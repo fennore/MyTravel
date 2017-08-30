@@ -2,29 +2,78 @@ home:
   path: ''
   methods: GET
   schemes: https
-  defaults: { _controller: MyTravel\Core\Controller\PageFactory::viewHomePage }
+  defaults: 
+    _controller: MyTravel\Core\Controller\PageFactory::viewHomePage
+    _format: html
 about:
   path: about
   methods: GET
   schemes: https
-  defaults: { _controller: MyTravel\Core\Controller\PageFactory::viewAboutPage }
+  defaults:
+    _controller: MyTravel\Core\Controller\PageFactory::viewAboutPage
+    _format: html
 imgeditlist:
   path: edit/image/{id}
   methods: GET
   schemes: https
-  defaults: { _controller: MyTravel\Core\Controller\PageFactory::viewEditImagePage, id: }
+  defaults: 
+    _controller: MyTravel\Core\Controller\PageFactory::viewEditImagePage
+    _format: html
+    id:
 imgfileview:
   path: img/{title}/{trailing}
   methods: GET
   schemes: https
-  defaults: { _controller: MyTravel\Core\Controller\Image::viewImage, trailing: }
+  defaults: 
+    _controller: MyTravel\Core\Controller\Image::viewImage
+    _format: image/*
+    trailing:
+itemview:
+  path: item/{title}
+  methods: GET
+  schemes: https
+  defaults:
+    _controller: MyTravel\Core\Controller\ItemController::view
+    _format: html
+itemapi:
+  path: api/item/{title}
+  methods: GET
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\ItemController::output
+    _format: json
+itemcreate:
+  path: api/item
+  methods: POST
+  schemes: https
+  defaults:
+    _controller: MyTravel\Core\Controller\ItemController::create
+    _format: json
+itemupdate:
+  path: api/item/{id}
+  methods: PUT
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\ItemController::update
+    _format: json
+itemdelete:
+  path: api/item/{id}
+  methods: DELETE
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\ItemController::delete
+    _format: json
 jsbundle:
   path: js/bundle
   methods: GET
   schemes: https
-  defaults: { _controller: MyTravel\Core\Controller\Js::viewJsBundle }
+  defaults:
+    _controller: MyTravel\Core\Controller\Js::viewJsBundle
+    _format: js
 cssbundle:
   path: css/bundle
   methods: GET
   schemes: https
-  defaults: { _controller: MyTravel\Core\Controller\Css::viewCssBundle }
+  defaults:
+    _controller: MyTravel\Core\Controller\Css::viewCssBundle
+    _format: css

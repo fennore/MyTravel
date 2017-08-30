@@ -103,9 +103,10 @@ final class Config implements ServiceFactoryInterface {
 
   /**
    * Make sure all configuration values contain proper values
+   * @todo Probably want to make use of validation / filtering with the treebuilder
    */
   private function verify($config) {
-    $config['basepath'] = \preg_replace('/\/+/', '/', '/' . $config['basepath'] . '/');
+    $config['basepath'] = \preg_replace('/\/+/', '/', '/' . rtrim($config['basepath'], '/'));
     return $config;
   }
 

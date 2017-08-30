@@ -1,12 +1,14 @@
 <?php
 namespace MyTravel\Core\Model;
 
+use MyTravel\Core\TemplateInterface;
+
 /**
  * The page object.
  * Contains all data needed to show a full page,
  * through a given template file.
  */
-class Page {
+class Page implements TemplateInterface {
 
   /**
    * Views subpath to template file

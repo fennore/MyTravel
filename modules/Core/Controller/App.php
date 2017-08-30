@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -41,6 +42,12 @@ class App {
    * @var Symfony\Component\DependencyInjection\ContainerBuilder
    */
   private $serviceContainer;
+
+  /**
+   * The Request object
+   * @var Symfony\Component\HttpFoundation\Request
+   */
+  private $request;
 
   protected function __construct() {
 
@@ -96,8 +103,10 @@ class App {
       if (empty($this->autoloader)) {
         throw new ErrorException('No proper autoloader has been set. This is required before building.');
       }
+      //
+      $this->setRequest();
       // Set services container
-      $this->setServices();
+      $this->registerServices();
       // Load Modules
       // => this needs to be done first after setting services
       $this->serviceContainer
@@ -130,7 +139,7 @@ class App {
       /** @todo add message to php-error list */
       if ($this->inDevelopment()) {
         var_dump($ex->getTrace());
-      }
+      } // *** You haven't seen this ***
       throw $ex;
     }
 
@@ -142,10 +151,9 @@ class App {
    * @return $this
    */
   public function output() {
-    $theming = new Theming();
-    $theming->load();
-    // Create request object
-    $request = Request::createFromGlobals();
+    // Add output listeners
+    $oc = new OutputController();
+    $oc->listen();
     // Create matcher
     $matcher = new UrlMatcher(Routing::get()->routes(), new RequestContext());
     // Subscribe a route listener to the events
@@ -156,10 +164,10 @@ class App {
       $this->serviceContainer->get('events'), new ControllerResolver(), new RequestStack(), new ArgumentResolver()
     );
 
-    $response = $kernel->handle($request);
+    $response = $kernel->handle($this->getRequest());
     $response->send();
 
-    $kernel->terminate($request, $response);
+    $kernel->terminate($this->getRequest(), $response);
 
     return $this;
   }
@@ -173,7 +181,7 @@ class App {
    * Use App::service() to access any service,
    * or use App::event() as alias to access the events service.
    */
-  private function setServices() {
+  private function registerServices() {
     $this->serviceContainer = new ContainerBuilder();
     // Register some services
     // Config
@@ -260,22 +268,77 @@ class App {
 
   /**
    * Check if application is considered to be in development environment
+   * @todo properly handle possible error from mistake in config => show that mistake
+   * instead of fatalling out incomprehensibly
    * @return boolean
    */
   public function inDevelopment() {
-    return Config::get()->environment === 'dev';
+    try {
+      return Config::get()->environment === 'dev';
+    } catch (Throwable $e) {
+      return false;
+    }
+  }
+
+  private function setRequest() {
+    // Create request object
+    $this->request = Request::createFromGlobals();
+    // Add better json request support
+    // check request Content-Type
+    $ctCheck = 0 === strpos(
+        $this->request->headers->get('CONTENT_TYPE')
+        , 'application/json'
+    );
+    // check request Method
+    $methodCheck = in_array(
+      strtoupper($this->request->server->get('REQUEST_METHOD', 'GET'))
+      , array('PUT', 'DELETE', 'POST')
+    );
+    if ($ctCheck && $methodCheck) {
+      $params = (array) json_decode($this->request->getContent());
+      $this->request->request = new ParameterBag($params);
+    }
+  }
+
+  public function getRequest() {
+    return $this->request;
   }
 
   /**
-   * Alias for Config::get()->basepath
+   * Get the base path for the application.
+   * This is needed for when your app runs on a subdirectory of a domain.
    * @return string
    */
   public function basePath() {
-    return Config::get()->basepath;
+    return $this
+        ->getRequest()
+        ->getBasePath();
+  }
+
+  /**
+   * Get a clean path version of a string.
+   * @todo find something better (Symfony has path / url function?)
+   * @param string $str
+   */
+  public function cleanPathString($str, $replace = array(), $delimiter = '-') {
+    setlocale(LC_ALL, 'en_US.UTF8');
+
+    if (!empty($replace)) {
+      $str = str_replace((array) $replace, ' ', $str);
+    }
+
+    //$str = preg_replace(array('/�/', '/�/', '/�/', '/�/', '/�/', '/�/'), array('Ae', 'Oe', 'Ue', 'ae', 'oe', 'ue'), $str);
+    $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
+    $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
+    $clean = strtolower(trim($clean, '-'));
+    $clean = preg_replace("/[\/_|+ -]+/", $delimiter, $clean);
+
+    return $clean;
   }
 
   /**
    * @todo use an authentication service (Symfony)
+   * This should not stay within App but move to some kind of User / Auth controller
    * @param type $key
    * @param type $access
    * @param type $user

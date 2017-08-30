@@ -2,16 +2,17 @@
 
 namespace MyTravel\Core\Controller;
 
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\HttpFoundation\Response;
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
+use MyTravel\Core\OutputInterface;
+use MyTravel\Core\TemplateInterface;
 
 /**
  *
  */
-class Theming {
+class Theming implements OutputInterface {
+
   private $themer;
 
   /**
@@ -21,7 +22,7 @@ class Theming {
    *  - basepath: application basepath when the website does not run on domain root
    *  - svgsprite: sprite file for svg used in theming
    */
-  public function load() {
+  public function __construct() {
     // get theme from config
     $themingDirectory = Config::get()->directories['views'] . '/' . Config::get()->view;
     $svgSpritePath = $themingDirectory . '/img/sprite.svg';
@@ -33,21 +34,34 @@ class Theming {
     if (\file_exists($svgSpritePath)) {
       $this->themer->addGlobal('svgsprite', \file_get_contents($svgSpritePath));
     }
-    App::event()
-      ->addListener(KernelEvents::VIEW, array($this, 'view'));
   }
 
   /**
-   * Render a view.
+   * Render twig template
+   * @param string $template Template file
+   * @param array $variables Variables to use in template
+   * @return string
+   */
+  public function render($template, $variables) {
+    return $this->themer->render($template, $variables);
+  }
+
+  /**
+   * View output.
    * @param GetResponseForControllerResultEvent $event
    */
-  public function view(GetResponseForControllerResultEvent $event) {
+  public function output(GetResponseForControllerResultEvent $event) {
     // Load template file
-    $template = $event->getControllerResult()->getTemplate() ?? 'default.tpl';
-    $variables = $event->getControllerResult()->getVariables() ?? array();
-    $themedOutput = $this->themer->render($template, $variables);
-    // Set response
-    $event->setResponse(new Response($themedOutput));
+    $controllerResult = $event->getControllerResult();
+    if ($controllerResult instanceof TemplateInterface) {
+      $template = $controllerResult->getTemplate() ?? 'default.tpl';
+      $variables = $controllerResult->getVariables() ?? array();
+    } else {
+      throw new ErrorException('html output expects a TemplateInterface controller result');
+    }
+    $themedOutput = $this->render($template, $variables);
+
+    return $themedOutput;
   }
 
 }
