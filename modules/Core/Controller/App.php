@@ -2,6 +2,7 @@
 
 namespace MyTravel\Core\Controller;
 
+use DateTime;
 use Throwable;
 use ErrorException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -148,6 +150,8 @@ class App {
 
   /**
    * Handles the application output.
+   * @todo check if and where caching can be improved.
+   *
    * @return $this
    */
   public function output() {
@@ -285,6 +289,13 @@ class App {
   private function setRequest() {
     // Create request object
     $this->request = Request::createFromGlobals();
+    // Check caching and exit if so
+    $response = new Response();
+    $response->setLastModified(new DateTime('-1 day'));
+    if ($response->isNotModified($this->getRequest())) {
+      $response->send();
+      exit();
+    }
     // Add better json request support
     // check request Content-Type
     $ctCheck = 0 === strpos(
