@@ -32,6 +32,15 @@ final class Db implements ServiceFactoryInterface {
   }
 
   /**
+   * Flush all connections
+   */
+  public static function flushAll() {
+    foreach ((array) self::$dbServiceController->connection as $connection) {
+      $connection->flush();
+    }
+  }
+
+  /**
    * Set config as service
    * @return self
    */
@@ -81,10 +90,14 @@ final class Db implements ServiceFactoryInterface {
   /**
    * Synchronize database with newest database structure from code.
    * @todo Only run this when there are changes.
+   *  => something wrong with default comparator always dropping and recreating all
    * @param type $name
    * @return $this
    */
   protected function sync($name = 'sqlite') {
+    if (false || !App::get()->inDevelopment()) {
+      return;
+    }
     // Gather all database mapping
     $metaDataClassList = $this->connection[$name]
       ->getMetadataFactory()

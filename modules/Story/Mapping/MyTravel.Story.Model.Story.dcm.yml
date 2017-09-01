@@ -1,3 +1,8 @@
 MyTravel\Story\Model\Story:
   type: entity
   table: story
+  oneToOne:
+    file:
+      targetEntity: MyTravel\Core\Model\File
+      joinColumn:
+        name: fileId

@@ -33,15 +33,20 @@ itemview:
   methods: GET
   schemes: https
   defaults:
-    _controller: MyTravel\Core\Controller\ItemController::view
+    _controller: MyTravel\Core\Controller\PageFactory::viewItemPage
     _format: html
+    _type: MyTravel\Core\Model\Item
+    title:
 itemapi:
-  path: api/item/{title}
+  path: api/item/{offset}/{length}
   methods: GET
   schemes: https
   defaults: 
     _controller: MyTravel\Core\Controller\ItemController::output
     _format: json
+    _type: MyTravel\Core\Model\Item
+    offset: 0
+    length: 10
 itemcreate:
   path: api/item
   methods: POST
@@ -49,6 +54,7 @@ itemcreate:
   defaults:
     _controller: MyTravel\Core\Controller\ItemController::create
     _format: json
+    _type: MyTravel\Core\Model\Item
 itemupdate:
   path: api/item/{id}
   methods: PUT
@@ -56,6 +62,7 @@ itemupdate:
   defaults: 
     _controller: MyTravel\Core\Controller\ItemController::update
     _format: json
+    _type: MyTravel\Core\Model\Item
 itemdelete:
   path: api/item/{id}
   methods: DELETE
@@ -63,6 +70,7 @@ itemdelete:
   defaults: 
     _controller: MyTravel\Core\Controller\ItemController::delete
     _format: json
+    _type: MyTravel\Core\Model\Item
 jsbundle:
   path: js/bundle
   methods: GET

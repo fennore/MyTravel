@@ -16,10 +16,10 @@ MyTravel\Core\Model\Item:
       joinTable:
         name: itemlink
         joinColumns:
-          itemid1:
+          itemId1:
             referencedColumnName: id
         inverseJoinColumns:
-          itemid2:
+          itemiId2:
             referencedColumnName: id
   fields:
     status:
@@ -28,7 +28,10 @@ MyTravel\Core\Model\Item:
     weight:
       type: integer
       unsigned: true
-    timestamp:
+    created:
+      type: integer
+      unsigned: true
+    updated:
       type: integer
       unsigned: true
     path:
@@ -38,4 +41,4 @@ MyTravel\Core\Model\Item:
       type: text
   indexes:
     itemListSelect:
-      columns: [ status, timestamp, weight ]
+      columns: [ status, created, weight ]

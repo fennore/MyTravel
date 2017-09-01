@@ -1,6 +1,11 @@
 MyTravel\Timeline\Model\TimelineItem:
   type: entity
   table: timelineitem
+  oneToOne:
+    file:
+      targetEntity: MyTravel\Core\Model\File
+      joinColumn:
+        name: fileId
   fields:
     property:
       type: text

@@ -6,10 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use MyTravel\Core\Model\Page;
 
 /**
- * @todo should use database and stuff.
- * Rename to PageController when that happens.
- * This can probably just use item stuff anyway.
- * And then it can just use Item controller and we can get rid of this eye bleeding stuff.
+ * @todo should use database and stuff for PageItem.
+ * A page should be an item of type PageItem.
  */
 class PageFactory {
 
@@ -24,6 +22,31 @@ class PageFactory {
   public static function viewEditImagePage(Request $request) {
     $templateVariables = array('page' => 'edit image');
     return new Page('edit-image.tpl', $templateVariables);
+  }
+  public static function viewItemPage(Request $request) {
+    $type = $request
+      ->attributes
+      ->get('_type');
+    $pathTitle = $request->attributes->get('title');
+    $ctrl = new ItemController($type);
+    $itemList = $ctrl->getItemList();
+    if (!empty($pathTitle)) {
+      $item = $ctrl->getItemByTitle($pathTitle);
+    } else {
+      $item = $itemList[0];
+    }
+
+    // Set Template suggestions
+    $template = array(
+      'item-' . $item->getType() . '.tpl',
+      'item.tpl'
+    );
+    // Set data
+    $variables = array(
+      'item' => $item,
+      'itemList' => $itemList
+    );
+    return new Page($template, $variables);
   }
 
 }

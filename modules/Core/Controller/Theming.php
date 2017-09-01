@@ -2,6 +2,7 @@
 
 namespace MyTravel\Core\Controller;
 
+use ErrorException;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
@@ -43,6 +44,12 @@ class Theming implements OutputInterface {
    * @return string
    */
   public function render($template, $variables) {
+    // If array is given for template resolve
+    if (is_array($template)) {
+      $resolved = $this->themer->resolveTemplate($template);
+      // overwrite
+      $template = $resolved->getTemplateName();
+    }
     return $this->themer->render($template, $variables);
   }
 
