@@ -17,13 +17,6 @@ class JsonOutput implements OutputInterface {
   public function output(GetResponseForControllerResultEvent $event) {
     // Set response object
     $response = new JsonResponse($event->getControllerResult());
-    // Set caching for json GET
-    if ($event->getRequest()->getMethod() === 'GET') {
-      $response
-        ->setMaxAge(60 * 60 * 24) //
-        ->setExpires(new DateTime('1 day'))
-        ->setLastModified(new DateTime());
-    }
     return $response;
   }
 

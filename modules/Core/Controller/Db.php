@@ -37,6 +37,7 @@ final class Db implements ServiceFactoryInterface {
   public static function flushAll() {
     foreach ((array) self::$dbServiceController->connection as $connection) {
       $connection->flush();
+      $connection->clear();
     }
   }
 

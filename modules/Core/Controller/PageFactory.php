@@ -20,6 +20,8 @@ class PageFactory {
     return new Page('about.tpl', $templateVariables);
   }
   public static function viewEditImagePage(Request $request) {
+    $files = new FileController();
+    $files->sync();
     $templateVariables = array('page' => 'edit image');
     return new Page('edit-image.tpl', $templateVariables);
   }

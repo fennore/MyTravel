@@ -12,5 +12,11 @@ MyTravel\Core\Model\File:
     lastmodified:
       type: integer
       unsigned: true
+    path:
+    type:
     data:
       type: blob
+      nullable: true
+  indexes:
+    fileSelect:
+      columns: [ type, path ]

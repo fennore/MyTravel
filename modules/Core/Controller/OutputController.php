@@ -2,6 +2,7 @@
 
 namespace MyTravel\Core\Controller;
 
+use DateTime;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -75,6 +76,13 @@ class OutputController {
         $response = new Response($output);
       } else {
         $response = $output;
+      }
+      // Set caching for json GET
+      if ($event->getRequest()->getMethod() === 'GET') {
+        $response
+          ->setMaxAge(60 * 60 * 24) //
+          ->setExpires(new DateTime('1 day'))
+          ->setLastModified(new DateTime());
       }
       $event->setResponse($response);
     }

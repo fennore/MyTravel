@@ -58,7 +58,7 @@ class App {
   /**
    * Interact with the application.
    * This simply returns the application object.
-   * @return MyTravel\Core\Controller\App
+   * @return App
    */
   public static function get() {
     return self::$app;
@@ -97,7 +97,7 @@ class App {
    * Build the application.
    * This loads all modules, and dispatches events.
    * @todo support composer (set composer as autoloader?)
-   * @return $this
+   * @return App
    * @throws ErrorException
    */
   public function build() {
@@ -152,7 +152,7 @@ class App {
    * Handles the application output.
    * @todo check if and where caching can be improved.
    *
-   * @return $this
+   * @return App
    */
   public function output() {
     // Add output listeners
@@ -217,6 +217,7 @@ class App {
    * @todo Check for using class loader caching(xcache, apc, wincache, ...)
    * @param string $autoloaderPath Required. Path to the file containing the autoloader
    * @param callback $callback Required.
+   * @return App
    */
   public function setAutoloader($id, $autoloaderPath, $instanceCall) {
     // Uses
@@ -230,6 +231,7 @@ class App {
    * Set prefixes for autoloading classes without composer.
    * @param callback $callback Required
    * @param array $prefixes
+   * @return App
    */
   public function setAutoloadPrefixes($id, $callback, $newPrefixes = array()) {
     // Set callback
@@ -248,12 +250,13 @@ class App {
     // Support method chaining
     return $this;
   }
+
   /**
    * Add more prefixes for sources to the autoloader.
    * This is used for example by modules to register themselves.
    * @param type $prefix
    * @param type $source
-   * @return $this
+   * @return App
    */
   public function addAutoloadPrefix($id, $prefix, $source) {
     call_user_func_array(array($this->autoloader[$id], $this->cbalPrefix[$id]), array($prefix, $source));
@@ -286,6 +289,16 @@ class App {
     }
   }
 
+  /**
+   * Set the request.
+   * Checks for last modified to return 304 and stop processing,
+   * returning cache instead.
+   * @todo See if we or how we can best implement
+   *       specific last modified checks for files, pages etc.
+   * @todo Fix config loading so we can overload it.
+   *       Then we can check for dev environment to disable lastmodified check.
+   *       Then overload the cache by force after modules have loaded.
+   */
   private function setRequest() {
     // Create request object
     $this->request = Request::createFromGlobals();
@@ -313,6 +326,10 @@ class App {
     }
   }
 
+  /**
+   * Get the request object.
+   * @return Symfony\Component\HttpFoundation\Request
+   */
   public function getRequest() {
     return $this->request;
   }
