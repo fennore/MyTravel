@@ -97,7 +97,7 @@ final class Db implements ServiceFactoryInterface {
    * @return $this
    */
   protected function sync($name = 'sqlite') {
-    if (false || !App::get()->inDevelopment()) {
+    if (!App::get()->inDevelopment()) {
       return;
     }
     // Gather all database mapping
