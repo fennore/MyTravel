@@ -7,7 +7,7 @@ use ReflectionClass;
 use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Model\Module;
 use Symfony\Component\Finder\Finder;
-
+use MyTravel\Core\CoreEvents;
 
 final class Modules implements ServiceFactoryInterface {
 
@@ -39,11 +39,43 @@ final class Modules implements ServiceFactoryInterface {
     if (!isset($this->modules)) {
       $this->modules = $this->find();
     }
+    // Build config listeners for modules before loading config during load
+    $this->addConfigListeners();
     foreach ($this->modules as $module) {
       $module->load();
     }
     return $this;
   }
+  /**
+   * Add Config listeners for all active modules.
+   * @return $this
+   */
+  private function addConfigListeners() {
+    $events = array(
+      CoreEvents::APPCONFIG => 'application',
+      CoreEvents::DIRCONFIG => 'applicationDirectories',
+      CoreEvents::DBCONFIG => 'database'
+    );
+    array_map(array($this, 'addModuleConfigListeners'), $events, array_keys($events));
+    return $this;
+  }
+
+  private function addModuleConfigListeners($call, $id) {
+    $modules = Modules::get()->all();
+    foreach ($modules as $module) {
+      $class = 'MyTravel\\' . $module->name . '\Config';
+      if (/* !$module->isActive() || */!class_exists($class)) {
+        continue;
+      }
+      $conf = new $class();
+      if (!method_exists($conf, $call)) {
+        continue;
+      }
+      App::event()
+        ->addListener($id, array($conf, $call));
+    }
+  }
+
   /**
    * Initialize loaded modules
    * @throws ErrorException

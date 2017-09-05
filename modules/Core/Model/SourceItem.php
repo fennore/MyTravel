@@ -19,7 +19,6 @@ namespace MyTravel\Core\Model;
 
 trait SourceItem {
 
-  private $itemId;
-  private $file;
+  protected $file;
 
 }

@@ -12,22 +12,6 @@ about:
   defaults:
     _controller: MyTravel\Core\Controller\PageFactory::viewAboutPage
     _format: html
-imgeditlist:
-  path: edit/image/{id}
-  methods: GET
-  schemes: https
-  defaults: 
-    _controller: MyTravel\Core\Controller\PageFactory::viewEditImagePage
-    _format: html
-    id:
-imgfileview:
-  path: img/{title}/{trailing}
-  methods: GET
-  schemes: https
-  defaults: 
-    _controller: MyTravel\Core\Controller\Image::viewImage
-    _format: image/*
-    trailing:
 itemview:
   path: item/{title}
   methods: GET

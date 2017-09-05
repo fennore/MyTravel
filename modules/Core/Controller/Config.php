@@ -68,16 +68,23 @@ final class Config implements ServiceFactoryInterface {
       $dbConfig = $processor->processConfiguration(
         new DatabaseConfiguration(), array($dbFileConfig)
       );
-      // Load routing setup, only paths can be altered in config
-      $routingConfig = $processor->processConfiguration(
-        new RoutingConfiguration(), array($routingFileConfig)
-      );
+      
       $fullConfig = $appConfig +
         array('database' => $dbConfig) +
-        array('routing' => $routingConfig)
+        array('routing' => $routingFileConfig)
       ;
       return $this->verify($fullConfig);
     }
+  }
+
+  public function addRoutingConfig() {
+    // Set config processor
+    $processor = new Processor();
+    // Load routing setup, only paths can be altered in config
+    $routingConfig = $processor->processConfiguration(
+      new RoutingConfiguration(), array($this->configurationTree['routing'])
+    );
+    $this->configurationTree['routing'] = $routingConfig;
   }
 
   /**

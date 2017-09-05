@@ -19,33 +19,27 @@ class PageFactory {
     $templateVariables = array('page' => 'about');
     return new Page('about.tpl', $templateVariables);
   }
-  public static function viewEditImagePage(Request $request) {
-    $files = new FileController();
-    $files->sync();
-    $templateVariables = array('page' => 'edit image');
-    return new Page('edit-image.tpl', $templateVariables);
-  }
+
   public static function viewItemPage(Request $request) {
-    $type = $request
-      ->attributes
-      ->get('_type');
-    $pathTitle = $request->attributes->get('title');
-    $ctrl = new ItemController($type);
+    $pathTitle = $request->getPathInfo();
+    $ctrl = new ItemController();
     $itemList = $ctrl->getItemList();
-    if (!empty($pathTitle)) {
+    if (!empty($request->attributes->get('title'))) {
       $item = $ctrl->getItemByTitle($pathTitle);
-    } else {
+    } else if (!empty($itemList)) {
       $item = $itemList[0];
     }
 
     // Set Template suggestions
     $template = array(
-      'item-' . $item->getType() . '.tpl',
       'item.tpl'
     );
+    if (!empty($item)) {
+      array_unshift($template, 'item-' . $item->getType() . '.tpl');
+    }
     // Set data
     $variables = array(
-      'item' => $item,
+      'item' => $item ?? null,
       'itemList' => $itemList
     );
     return new Page($template, $variables);

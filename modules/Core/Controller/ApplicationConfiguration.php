@@ -5,6 +5,7 @@ namespace MyTravel\Core\Controller;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use MyTravel\Core\Event\ConfigNodeEvent;
+use MyTravel\Core\CoreEvents;
 
 final class ApplicationConfiguration implements ConfigurationInterface {
 
@@ -32,7 +33,7 @@ final class ApplicationConfiguration implements ConfigurationInterface {
     ;
     // Dispatch event for altering application config node
     $event = new ConfigNodeEvent($node);
-    App::event()->dispatch('module.config.application', $event);
+    App::event()->dispatch(CoreEvents::APPCONFIG, $event);
     // Directories
     $this->buildDirectoryNode($node);
     $node->end();
@@ -55,7 +56,7 @@ final class ApplicationConfiguration implements ConfigurationInterface {
 
     // Dispatch event for altering application directories config node
     $event = new ConfigNodeEvent($subnode);
-    App::event()->dispatch('module.config.application.directories', $event);
+    App::event()->dispatch(CoreEvents::DIRCONFIG, $event);
     // Close the sub tree branches
     $node
       ->end()

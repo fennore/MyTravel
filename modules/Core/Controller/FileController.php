@@ -47,8 +47,4 @@ class FileController {
     Db::get()->clear();
   }
 
-  public function getFileList() {
-    
-  }
-
 }

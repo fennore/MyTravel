@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use MyTravel\Core\CoreSubscriber;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -97,6 +98,13 @@ class App {
    * Build the application.
    * This loads all modules, and dispatches events.
    * @todo support composer (set composer as autoloader?)
+   * @todo split config between db / app / route
+   * => load db config as first (for possible module config in db)
+   * => load module config (status / active / event weights)
+   * => then load modules
+   * => load app config
+   * => load routing
+   * => update routing
    * @return App
    * @throws ErrorException
    */
@@ -111,6 +119,7 @@ class App {
       $this->registerServices();
       // Load Modules
       // => this needs to be done first after setting services
+      // - this will also load basic config
       $this->serviceContainer
         ->get('modules')
         ->load();
@@ -120,14 +129,10 @@ class App {
       $this->serviceContainer
         ->get('routing')
         ->build();
-      // Initialize modules
-      // - this will load config
-      // - config can update routing
-      //  => routing needs to be build before initializing modules,
-      //     so optional routing config can be properly validated.
+      // After routing is built we can add the config for it
       $this->serviceContainer
-        ->get('modules')
-        ->init();
+        ->get('config')
+        ->addRoutingConfig();
       // Update Routing from config
       $this->serviceContainer
         ->get('routing')
@@ -136,6 +141,11 @@ class App {
       $this->serviceContainer
         ->get('db')
         ->connect();
+      // Initialize modules
+      // - runs init on all active modules
+      $this->serviceContainer
+        ->get('modules')
+        ->init();
       //
     } catch (Throwable $ex) {
       /** @todo add message to php-error list */

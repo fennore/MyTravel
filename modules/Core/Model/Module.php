@@ -53,14 +53,18 @@ class Module {
     $this->checkIfAlreadyLoaded($moduleControllerClass);
     $this->controller = call_user_func_array(array($moduleControllerClass, 'load'), array());
     //
+    $this->status = Config::get()->modules[$this->name]['status'] ?? 'prod';
+    $this->active = Config::get()->modules[$this->name]['active'] ?? true;
     // Return for method chaining
     return $this;
   }
 
   public function init() {
-    // Load module configuration
-    $this->status = Config::get()->modules[$this->name]['status'] ?? 'prod';
-    $this->active = Config::get()->modules[$this->name]['active'] ?? true;
+    
+  }
+
+  public function isActive() {
+    return $this->active;
   }
 
 }

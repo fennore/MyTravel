@@ -6,6 +6,7 @@ use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use MyTravel\Core\Event\ConfigNodeEvent;
+use MyTravel\Core\CoreEvents;
 
 /**
  * @todo provide information to the config treebuilder.
@@ -51,7 +52,7 @@ final class DatabaseConfiguration implements ConfigurationInterface {
     ;
     // Dispatch event for altering database config node
     $event = new ConfigNodeEvent($node);
-    App::event()->dispatch('module.config.database', $event);
+    App::event()->dispatch(CoreEvents::DBCONFIG, $event);
     //
     $node->end();
 

@@ -77,7 +77,7 @@ class OutputController {
       } else {
         $response = $output;
       }
-      // Set caching for json GET
+      // Set caching for GET
       if ($event->getRequest()->getMethod() === 'GET') {
         $response
           ->setMaxAge(60 * 60 * 24) //

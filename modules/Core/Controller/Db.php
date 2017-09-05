@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Model\Module;
 use MyTravel\Core\Event\DbServiceEvent;
+use MyTravel\Core\CoreEvents;
 
 final class Db implements ServiceFactoryInterface {
 
@@ -61,8 +62,8 @@ final class Db implements ServiceFactoryInterface {
     // Dispatch event for altering application config node
     $event = new DbServiceEvent($this->connection[$name]);
     App::event()
-      ->dispatch('module.service.db.connect', $event);
-    $this->sync();
+      ->dispatch(CoreEvents::DBCONNECT, $event);
+    $this->sync($name);
     return $this;
   }
 

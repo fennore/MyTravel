@@ -10,16 +10,16 @@ use MyTravel\Core\Controller\App;
 class Item implements JsonSerializable {
 
   // Automatically assigned
-  private $id;
-  private $status;
-  private $weight;
-  private $created;
-  private $updated;
-  private $path;
-  private $link;
+  protected $id;
+  protected $status;
+  protected $weight;
+  protected $created;
+  protected $updated;
+  protected $path;
+  protected $link;
   // User provided
-  private $title;
-  private $content;
+  protected $title;
+  protected $content;
 
   public function __construct($newData) {
     $date = new DateTime();
@@ -93,8 +93,7 @@ class Item implements JsonSerializable {
   }
 
   public function jsonSerialize() {
-    $vars = get_object_vars($this);
-    return $vars;
+    return get_object_vars($this);
   }
 
 }

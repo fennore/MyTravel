@@ -4,6 +4,7 @@ namespace MyTravel\Core\Controller;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller for Items
@@ -16,12 +17,21 @@ class ItemController {
   private $classCall = 'MyTravel\Core\Model\Item';
 
   public function __construct($type = null) {
+    // Get type from request
+    if (!isset($type)) {
+      $type = App::get()
+        ->getRequest()
+        ->request
+        ->get('_type');
+    }
+    // Fall back to route default
     if (!isset($type)) {
       $type = App::get()
         ->getRequest()
         ->attributes
         ->get('_type');
     }
+    // Overwrite class default if type is set
     if (isset($type) && class_exists($type, true)) {
       $this->classCall = $type;
     }
@@ -37,14 +47,13 @@ class ItemController {
     $immutable = array('id', 'type', 'created', 'updated', 'link', 'path');
     array_map(array($request->request, 'remove'), $immutable);
     $newTitle = $request->request->get('title');
-    if (empty($newTitle)) {
+    if (isset($newTitle) && empty($newTitle)) {
       throw new Exception('Item title cannot be empty');
     }
   }
 
   public function getItemByTitle($pathTitle) {
     // Preparing query
-    $type = strtolower((new \ReflectionClass($this->classCall))->getShortName());
     $qb = Db::get()->createQueryBuilder();
     $expr = $qb
       ->expr()
@@ -57,7 +66,7 @@ class ItemController {
       ->from($this->classCall, 'i')
       ->where($expr)
       ->setParameter(':status', 1)
-      ->setParameter(':path', $type . '/' . $pathTitle);
+      ->setParameter(':path', trim($pathTitle, '/'));
     // Execute query
     $query = $qb->getQuery();
     return $query->getSingleResult();
@@ -143,6 +152,11 @@ class ItemController {
       ->find(
         $this->classCall, $request->attributes->get('id')
     );
+    if (!($item instanceof $this->classCall)) {
+      $response = new Response('Trying to update non existing item.');
+      $response->setStatusCode(400);
+      return $response;
+    }
     $oldPath = $item->path;
     $item->update($request->request->all());
     if ($oldPath !== $item->path) {
