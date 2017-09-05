@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Story\Controller;
+namespace MyTravel\Story;
 
 use MyTravel\Core\Event\ConfigNodeEvent;
 

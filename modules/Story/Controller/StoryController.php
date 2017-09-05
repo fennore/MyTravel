@@ -3,7 +3,6 @@
 namespace MyTravel\Story\Controller;
 
 use MyTravel\Core\ModuleControllerInterface;
-use MyTravel\Core\Controller\App;
 
 final class StoryController implements ModuleControllerInterface {
 
@@ -13,21 +12,9 @@ final class StoryController implements ModuleControllerInterface {
 
   }
 
-  private function addListeners() {
-    // Callback
-    $cb = array(new Config(), 'applicationDirectories');
-    App::event()
-      ->addListener('module.config.application.directories', $cb);
-    // Callback
-    $cb = array(new Routing(), 'build');
-    App::event()
-      ->addListener('module.routing.routes.build', $cb);
-  }
-
   public static function load() {
     if (!(self::$controller instanceof self)) {
       self::$controller = new self();
-      self::$controller->addListeners();
     }
     return self::$controller;
   }

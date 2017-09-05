@@ -1,5 +1,10 @@
-storyview:
+story:
   path: story/{title}
   methods: GET
   schemes: https
-  defaults: { callback: 'MyTravel\Story\Controller\StoryController::viewStory'}
+  defaults:
+    _controller: MyTravel\Core\Controller\PageFactory::viewItemPage
+    _type: MyTravel\Story\Model\Story
+    _format: html
+    title:
+
