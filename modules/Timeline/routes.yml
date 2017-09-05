@@ -1,0 +1,27 @@
+imgfileview:
+  path: img/{title}/{trailing}
+  methods: GET
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\Image::viewImage
+    _format: image/*
+    trailing:
+timeline:
+  path: timeline/{title}
+  methods: GET
+  schemes: https
+  defaults:
+    _controller: MyTravel\Core\Controller\PageFactory::viewItemPage
+    _type: MyTravel\Timeline\Model\TimelineItem
+    _format: html
+    title:
+timelineapi:
+  path: api/timeline/{offset}/{length}
+  methods: GET
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\ItemController::output
+    _format: json
+    _type: MyTravel\Timeline\Model\TimelineItem
+    offset: 0
+    length: 10

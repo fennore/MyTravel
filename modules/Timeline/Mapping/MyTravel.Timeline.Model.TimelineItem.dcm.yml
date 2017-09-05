@@ -8,7 +8,9 @@ MyTravel\Timeline\Model\TimelineItem:
         name: fileId
   fields:
     property:
-      type: text
+      type: json
+      nullable: true
     setting:
-      type: text
+      type: json
+      nullable: true
       
