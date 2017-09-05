@@ -60,7 +60,7 @@ class Module {
   }
 
   public function init() {
-    
+    $this->controller->init();
   }
 
   public function isActive() {
