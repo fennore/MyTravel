@@ -4,6 +4,7 @@ MyTravel\Timeline\Model\TimelineItem:
   oneToOne:
     file:
       targetEntity: MyTravel\Core\Model\File
+      fetch: EXTRA_LAZY
       joinColumn:
         name: fileId
   fields:

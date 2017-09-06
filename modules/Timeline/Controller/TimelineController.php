@@ -3,6 +3,8 @@
 namespace MyTravel\Timeline\Controller;
 
 use MyTravel\Core\ModuleControllerInterface;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\CoreEvents;
 
 final class TimelineController implements ModuleControllerInterface {
 
@@ -20,7 +22,9 @@ final class TimelineController implements ModuleControllerInterface {
   }
 
   public function init() {
-    
+    $cb = array(new TimelineItemController(), 'cleanGhostFiles');
+    App::event()
+      ->addListener(CoreEvents::RMFILES, $cb);
   }
 
 }

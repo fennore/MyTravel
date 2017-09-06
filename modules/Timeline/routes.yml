@@ -11,7 +11,7 @@ timeline:
   methods: GET
   schemes: https
   defaults:
-    _controller: MyTravel\Core\Controller\PageFactory::viewItemPage
+    _controller: MyTravel\Timeline\Controller\PageFactory::viewTimeline
     _type: MyTravel\Timeline\Model\TimelineItem
     _format: html
     title:
