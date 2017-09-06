@@ -21,11 +21,10 @@ class PageFactory {
   }
 
   public static function viewItemPage(Request $request) {
-    $pathTitle = $request->getPathInfo();
     $ctrl = new ItemController();
     $itemList = $ctrl->getItemList();
     if (!empty($request->attributes->get('title'))) {
-      $item = $ctrl->getItemByTitle($pathTitle);
+      $item = $ctrl->getItemByTitle($request);
     } else if (!empty($itemList)) {
       $item = $itemList[0];
     }

@@ -77,7 +77,11 @@ class Item implements JsonSerializable {
    * Should be called on create and update
    */
   public function setPath() {
-    $this->path = $this->getType() . '/' . App::get()->cleanPathString($this->title);
+    $this->path = trim($this->getType() . '/' . App::get()->cleanPathString($this->title), '/');
+  }
+
+  public function getPath() {
+    return $this->path;
   }
 
   public function getLink() {

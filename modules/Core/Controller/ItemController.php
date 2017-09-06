@@ -52,7 +52,8 @@ class ItemController {
     }
   }
 
-  public function getItemByTitle($pathTitle) {
+  public function getItemByTitle(Request $request) {
+    $pathTitle = $this->getPathMatchFromTitle($request);
     // Preparing query
     $qb = Db::get()->createQueryBuilder();
     $expr = $qb
@@ -66,10 +67,20 @@ class ItemController {
       ->from($this->classCall, 'i')
       ->where($expr)
       ->setParameter(':status', 1)
-      ->setParameter(':path', trim($pathTitle, '/'));
+      ->setParameter(':path', $pathTitle);
     // Execute query
     $query = $qb->getQuery();
     return $query->getSingleResult();
+  }
+
+  /**
+   * Safely get the match from title request to db path value
+   */
+  public function getPathMatchFromTitle(Request $request) {
+    $item = new $this->classCall(array(
+      'title' => $request->attributes->get('title')
+    ));
+    return $item->getPath();
   }
 
   public function getUniquePath($pathTitle) {
