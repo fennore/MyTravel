@@ -21,7 +21,7 @@ class Item implements JsonSerializable {
   protected $title;
   protected $content;
 
-  public function __construct($newData) {
+  public function __construct($newData = array()) {
     $date = new DateTime();
     $timestamp = $date->getTimestamp();
     $this->link = new ArrayCollection();

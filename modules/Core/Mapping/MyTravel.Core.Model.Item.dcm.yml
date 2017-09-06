@@ -13,6 +13,7 @@ MyTravel\Core\Model\Item:
   manyToMany:
     link:
       targetEntity: MyTravel\Core\Model\Item
+      fetch: EXTRA_LAZY
       joinTable:
         name: itemlink
         joinColumns:
@@ -39,6 +40,7 @@ MyTravel\Core\Model\Item:
     title:
     content:
       type: text
+      nullable: true
   indexes:
     itemListSelect:
       columns: [ status, created, weight ]

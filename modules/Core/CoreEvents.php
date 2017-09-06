@@ -3,10 +3,11 @@
 namespace MyTravel\Core;
 
 class CoreEvents {
-  const DBCONNECT = 'module.service.db.connect';
-  const APPCONFIG = 'module.config.application';
-  const DIRCONFIG = 'module.config.application.directories';
-  const DBCONFIG = 'module.config.database';
-  const BUILDROUTES = 'module.routing.routes.build';
+  const DBCONNECT = 'db.connect';
+  const APPCONFIG = 'config.application';
+  const DIRCONFIG = 'config.application.directories';
+  const DBCONFIG = 'config.database';
+  const BUILDROUTES = 'routing.routes.build';
+  const RMFILES = 'files.removed';
 
 }

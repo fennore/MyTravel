@@ -47,7 +47,7 @@ final class Modules implements ServiceFactoryInterface {
     return $this;
   }
   /**
-   * Add Config listeners for all active modules.
+   * Add Config listeners for all (active) modules.
    * @return $this
    */
   private function addConfigListeners() {
@@ -59,7 +59,13 @@ final class Modules implements ServiceFactoryInterface {
     array_map(array($this, 'addModuleConfigListeners'), $events, array_keys($events));
     return $this;
   }
-
+  /**
+   * Add config listeners for each (active) module
+   * @todo this requires module config to be loaded separately before,
+   * if at all viable and possible.
+   * @param type $call
+   * @param type $id
+   */
   private function addModuleConfigListeners($call, $id) {
     $modules = Modules::get()->all();
     foreach ($modules as $module) {
@@ -77,7 +83,7 @@ final class Modules implements ServiceFactoryInterface {
   }
 
   /**
-   * Initialize loaded modules
+   * Initialize loaded modules that are active
    * @throws ErrorException
    */
   public function init() {
@@ -86,7 +92,9 @@ final class Modules implements ServiceFactoryInterface {
       throw new ErrorException($msg);
     }
     foreach ($this->modules as $module) {
-      $module->init();
+      if ($module->isActive()) {
+        $module->init();
+      }
     }
     return $this;
   }

@@ -59,7 +59,7 @@ final class Db implements ServiceFactoryInterface {
     $this->connection[$name] = EntityManager::create(
         $connections[$name], $dbConfig
     );
-    // Dispatch event for altering application config node
+    // Dispatch event for interacting with db entity manager before sync
     $event = new DbServiceEvent($this->connection[$name]);
     App::event()
       ->dispatch(CoreEvents::DBCONNECT, $event);

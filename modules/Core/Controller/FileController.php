@@ -4,6 +4,9 @@ namespace MyTravel\Core\Controller;
 
 use Symfony\Component\Finder\Finder;
 use MyTravel\Core\Model\File;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\CoreEvents;
+use MyTravel\Core\Event\IdListEvent;
 
 class FileController {
   public function sync() {
@@ -43,6 +46,9 @@ class FileController {
       $file = Db::get()->merge($df);
       Db::get()->remove($file);
     }
+    // dispatch actions upon removed file items
+    $event = new IdListEvent(array_keys($dbFileSources));
+    App::event()->dispatch(CoreEvents::RMFILES, $event);
     Db::get()->flush(); //Persist objects that did not make up an entire batch
     Db::get()->clear();
   }

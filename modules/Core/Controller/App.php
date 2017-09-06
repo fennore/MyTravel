@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
-use MyTravel\Core\CoreSubscriber;
 
 /**
  * Singleton Application controller for setting up the application.
