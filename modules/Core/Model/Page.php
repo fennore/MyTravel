@@ -8,7 +8,7 @@ use MyTravel\Core\TemplateInterface;
  * Contains all data needed to show a full page,
  * through a given template file.
  */
-class Page implements TemplateInterface {
+final class Page implements TemplateInterface {
 
   /**
    * Views subpath to template file

@@ -9,7 +9,7 @@ use MyTravel\Core\Controller\Config;
  * Module wrapper class,
  * through which the application interacts with all modules
  */
-class Module {
+final class Module {
 
   protected $name;
   protected $controller;
