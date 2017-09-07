@@ -3,12 +3,12 @@
 namespace MyTravel\Core\Controller;
 
 use ErrorException;
-use DateTime;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use MyTravel\Core\OutputInterface;
 use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Model\ImageDataBag;
 
 class FileOutput implements OutputInterface {
   private $requestFormat;
@@ -17,6 +17,7 @@ class FileOutput implements OutputInterface {
   public function __construct(Request $request) {
     $this->requestFormat = $request->getRequestFormat();
   }
+
   /**
    *
    * @param GetResponseForControllerResultEvent $event Kernel event
@@ -26,38 +27,42 @@ class FileOutput implements OutputInterface {
   public function output(GetResponseForControllerResultEvent $event) {
     $this->file = $event->getControllerResult();
     $response = new Response();
-    $response->headers->set('Content-Type', $this->file->type);
-    switch ($this->file->type) {
-      case 'image/jpeg':
-        $this->jpegOutput($response, $event->getRequest()->attributes->get('trailing'));
+    // Images
+    switch ($this->file->getSupportedImageType()) {
+      case image_type_to_mime_type(IMAGETYPE_JPEG):
+        $this->jpegOutput($response);
+        break;
+      case image_type_to_mime_type(IMAGETYPE_PNG):
+        $this->pngOutput($response);
         break;
       default:
-        throw new ErrorException(sprintf('Unknown file format % request', array($file->type)));
+        throw new ErrorException(sprintf('Unknown file format %s request.', $this->file->type));
     }
+    //
+    $response->headers->set('Content-Type', $this->file->type);
+    // 
     return $response;
   }
 
   /**
-   *
-   * @param type $input
-   * @param type $width
-   * @param type $height
-   * @param type $crop
-   * @return type
+   * Create new image from different source.
+   * Can be cropped with crop attribute for imgdata parameter.
+   * @param resource $input Image resource
+   * @param ImageDataBag $imgdata Image output data
+   * @return Updated image resource
    */
-  private function createImage($input, $width, $height, $crop = array()) {
-    isset($crop['w']) ?: $crop['w'] = $width;
-    isset($crop['h']) ?: $crop['h'] = $height;
-    $exif = $this->file->property->exif;
-    $intermediate = imagecreatetruecolor($width, $height);
+  private function createImage($input, ImageDataBag $imgdata) {
+    $cropW = $imgdata->cw ?? $imgdata->w;
+    $cropH = $imgdata->ch ?? $imgdata->h;
+    $intermediate = imagecreatetruecolor($imgdata->w, $imgdata->h);
     $color = imagecolorallocate($intermediate, 255, 255, 255);
     imagestring($intermediate, 5, 5, 5, Config::get()->appname, $color);
-    imagecopyresampled($intermediate, $input, 0, 0, 0, 0, $width, $height, $exif['COMPUTED']['Width'], $exif['COMPUTED']['Height']);
-    if ($crop['w'] != $width || $crop['h'] != $height) {
-      $output = imagecreatetruecolor($crop['w'], $crop['h']);
-      $x = ($width - $crop['w']) / 2;
-      $y = ($height - $crop['h']) / 2;
-      imagecopyresampled($output, $intermediate, 0, 0, $x, $y, $crop['w'], $crop['h'], $crop['w'], $crop['h']);
+    imagecopyresampled($intermediate, $input, 0, 0, 0, 0, $imgdata->w, $imgdata->h, $imgdata->ow, $imgdata->oh);
+    if ($cropW != $imgdata->w || $cropH != $imgdata->h) {
+      $output = imagecreatetruecolor($cropW, $cropH);
+      $x = ($imgdata->w - $cropW) / 2;
+      $y = ($imgdata->h - $cropH) / 2;
+      imagecopyresampled($output, $intermediate, 0, 0, $x, $y, $cropW, $cropH, $cropW, $cropH);
       imagedestroy($intermediate);
     } else {
       $output = $intermediate;
@@ -66,59 +71,36 @@ class FileOutput implements OutputInterface {
 
     return $output;
   }
+
   /**
-   *
-   * @param type $widthLimit
-   * @param type $heightLimit
-   * @param type $doCrop
-   * @return stdClass
+   * Create jpeg response.
    */
-  private function calculateImageBounds($widthLimit, $heightLimit, $doCrop) {
-    // Requested ratio
-    $ratioDefault = $widthLimit / $heightLimit;
-    // EXIF data
-    $exif = $this->file->property->exif;
-    $ratio = $exif['COMPUTED']['Width'] / $exif['COMPUTED']['Height'];
-    // With crop set inner bounds
-    if ($doCrop && $ratio >= $ratioDefault) {
-      $width = $heightLimit * $ratio;
-      $height = $heightLimit;
-    } else if ($doCrop) {
-      $width = $widthLimit;
-      $height = $widthLimit / $ratio;
-    }
-    // Without crop set outer bounds
-    else if ($ratio >= $ratioDefault) {
-      $width = ($exif['COMPUTED']['Width'] > $widthLimit ? $widthLimit : $exif['COMPUTED']['Width']);
-      $height = ($exif['COMPUTED']['Width'] > $widthLimit ? $widthLimit / $ratio : $exif['COMPUTED']['Height']);
-    } else {
-      $width = ($exif['COMPUTED']['Height'] > $heightLimit ? $heightLimit * $ratio : $exif['COMPUTED']['Width']);
-      $height = ($exif['COMPUTED']['Height'] > $heightLimit ? $heightLimit : $exif['COMPUTED']['Height']);
-    }
-    return (object) array(
-      'w' => $width,
-      'h' => $height
+  private function jpegOutput(Response $response) {
+    $output = $this->createImage(
+      imagecreatefromjpeg($this->file->getFullSource()), $this->file->imgdata
     );
+    // Do the jpeg thing
+    ob_start();
+    imagejpeg($output, NULL, $this->file->imgdata->q);
+    imagedestroy($output);
+    $size = ob_get_length();
+    $img = ob_get_clean();
+    // We need to set Content-Length for caching to work
+    // For some reason the browser fails to apply it itself
+    $response->headers->set('Content-Length', $size);
+    $response->setContent($img);
   }
 
   /**
-   * @todo introduce image config settings?
-   * And refactor into something proper.
+   * Create png response.
    */
-  private function jpegOutput(Response $response, $trailing = '') {
-    // Set crop
-    $crop = ($trailing === 'thumbnail') ? array('w' => 160, 'h' => 120) : array();
-    // Bounds
-    $heightLimit = ($trailing === 'thumbnail') ? 120 : 1080;
-    $widthLimit = ($trailing === 'thumbnail') ? 160 : 1920;
-    $bounds = $this->calculateImageBounds($widthLimit, $heightLimit, !empty($crop));
-    // Set quality
-    $quality = ($trailing === 'thumbnail') ? 75 : 84;
-        
-    $output = $this->createImage(imagecreatefromjpeg($this->file->getFullSource()), $bounds->w, $bounds->h, $crop);
+  private function pngOutput(Response $response) {
+    $output = $this->createImage(
+      imagecreatefrompng($this->file->getFullSource()), $this->file->imgdata
+    );
     // Do the jpeg thing
     ob_start();
-    imagejpeg($output, NULL, $quality);
+    imagepng($output);
     imagedestroy($output);
     $size = ob_get_length();
     $img = ob_get_clean();
