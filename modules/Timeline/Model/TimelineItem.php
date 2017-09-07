@@ -9,7 +9,7 @@ use MyTravel\Core\Model\File;
 use MyTravel\Core\Controller\Routing;
 use MyTravel\Core\Controller\App;
 
-final class TimelineItem extends Item {
+class TimelineItem extends Item {
 
   use SourceItem {
     setFile as sourceItemSetFile;

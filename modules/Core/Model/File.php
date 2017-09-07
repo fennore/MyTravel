@@ -6,6 +6,7 @@ use Symfony\Component\Finder\SplFileInfo;
 use MyTravel\Core\Controller\Config;
 
 class File {
+
   private $id;
   private $source;
   private $path;
@@ -42,6 +43,21 @@ class File {
 
   public function getFullSource() {
     return Config::get()->directories['files'] . '/' . $this->source;
+  }
+
+  public function isImage() {
+    $support = imagetypes();
+    $types = array(
+      IMG_JPEG => image_type_to_mime_type(IMAGETYPE_JPEG),
+      IMG_PNG => image_type_to_mime_type(IMAGETYPE_PNG),
+      IMG_GIF => image_type_to_mime_type(IMAGETYPE_GIF),
+      IMG_WBMP => image_type_to_mime_type(IMAGETYPE_WBMP)
+    );
+    // IMG_BMP | IMG_GIF | IMG_JPG | IMG_PNG | IMG_WBMP | IMG_XPM | IMG_WEBP
+    var_dump($types);
+    var_dump();
+    $bitCheck = array_search($this->type, $types);
+    return $support & $bitCheck;
   }
 
 }

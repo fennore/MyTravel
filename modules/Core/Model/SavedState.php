@@ -2,7 +2,7 @@
 
 namespace MyTravel\Core\Model;
 
-final class SavedState {
+class SavedState {
 
   private $key;
   private $state;
