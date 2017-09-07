@@ -15,7 +15,7 @@
   #        name: fileId
   # */
 
-namespace MyTravel\Core\Model;
+namespace MyTravel\Core;
 
 use MyTravel\Core\Model\File;
 use MyTravel\Core\Model\Item;
@@ -45,6 +45,10 @@ trait SourceItem {
     if (empty($this->title) && $this instanceof Item) {
       $this->setTitle(pathinfo($this->file->source)['filename']);
     }
+  }
+
+  public function detachFile() {
+    unset($this->file);
   }
 
 }
