@@ -312,9 +312,12 @@ class App {
     // Create request object
     $this->request = Request::createFromGlobals();
     // Check caching and exit if so
+    // - create a dummy response for possible 304
     $response = new Response();
     $response->setLastModified(new DateTime('-1 day'));
     if ($response->isNotModified($this->getRequest())) {
+      $response->setPublic();
+      $response->setSharedMaxAge(60 * 60 * 24);
       $response->send();
       exit();
     }

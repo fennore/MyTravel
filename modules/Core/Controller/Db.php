@@ -87,7 +87,7 @@ final class Db implements ServiceFactoryInterface {
     //
     // see what it returns
     // and look for best cross-module implementation
-    return Setup::createYAMLMetadataConfiguration($paths, false);
+    return Setup::createYAMLMetadataConfiguration($paths, App::get()->inDevelopment());
   }
   /**
    * Synchronize database with newest database structure from code.

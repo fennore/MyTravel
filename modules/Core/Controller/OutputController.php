@@ -58,6 +58,12 @@ class OutputController {
     // // js
     // // css
     // // img
+    $fileFormats = array(
+      'image/*'
+    );
+    if (in_array($request->getRequestFormat(), $fileFormats)) {
+      $this->outputHandler = new FileOutput($request);
+    }
     // text/html default output as theming
     // Note: no html output on XmlHttpRequest!
     if (!($this->outputHandler instanceof OutputInterface) && !$request->isXmlHttpRequest()) {
@@ -77,12 +83,19 @@ class OutputController {
       } else {
         $response = $output;
       }
-      // Set caching for GET
-      if ($event->getRequest()->getMethod() === 'GET') {
+      // Set caching for GET.
+      // It's dumb caching.
+      // But dumb caching rocks because it's fast!
+      // Especially with proper CDN in-between to cache once for all.
+      $methodCheck = $event->getRequest()->getMethod() === 'GET';
+      $lastModCheck = empty($response->getLastModified());
+      if ($methodCheck) {
         $response
-          ->setMaxAge(60 * 60 * 24) //
-          ->setExpires(new DateTime('1 day'))
-          ->setLastModified(new DateTime());
+          ->setSharedMaxAge(60 * 60 * 24) //
+          ->setExpires(new DateTime('1 day'));
+      }
+      if ($methodCheck && $lastModCheck) {
+        $response->setLastModified(new DateTime());
       }
       $event->setResponse($response);
     }

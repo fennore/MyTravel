@@ -9,7 +9,11 @@ class Image {
   public static function view(Request $request) {
     $ctrl = new ItemController();
     $item = $ctrl->getItemByTitle($request);
-    var_dump($item->file);
+    $file = $item->file;
+    // Add external info to file for output
+    $file->property = $item->property;
+    $file->setting = $item->setting;
+    return $file;
   }
 
 }

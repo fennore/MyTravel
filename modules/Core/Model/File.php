@@ -3,6 +3,7 @@
 namespace MyTravel\Core\Model;
 
 use Symfony\Component\Finder\SplFileInfo;
+use MyTravel\Core\Controller\Config;
 
 class File {
   private $id;
@@ -37,6 +38,10 @@ class File {
       $this->lastmodified = $newData->getMTime();
       //$this->data = $newData->getContents();
     }
+  }
+
+  public function getFullSource() {
+    return Config::get()->directories['files'] . '/' . $this->source;
   }
 
 }
