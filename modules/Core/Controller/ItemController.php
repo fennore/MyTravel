@@ -148,7 +148,7 @@ class ItemController {
    */
   public function output(Request $request) {
     return $this->getItemList(
-      $request->attributes->get('offset'), $request->attributes->get('limit')
+      $request->attributes->get('offset'), $request->attributes->get('length')
     );
   }
 
