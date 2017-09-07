@@ -3,13 +3,13 @@
 namespace MyTravel\Timeline\Model;
 
 use Throwable;
-use MyTravel\Core\Model\SourceItem;
+use MyTravel\Core\SourceItem;
 use MyTravel\Core\Model\Item;
 use MyTravel\Core\Model\File;
 use MyTravel\Core\Controller\Routing;
 use MyTravel\Core\Controller\App;
 
-class TimelineItem extends Item {
+final class TimelineItem extends Item {
 
   use SourceItem {
     setFile as sourceItemSetFile;
