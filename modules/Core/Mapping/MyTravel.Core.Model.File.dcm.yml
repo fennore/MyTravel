@@ -3,7 +3,7 @@ MyTravel\Core\Model\File:
   table: file
   id:
     id:
-      type: bigint
+      type: integer
       generator:
         strategy: AUTO
   fields:
