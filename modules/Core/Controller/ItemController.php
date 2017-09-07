@@ -51,7 +51,12 @@ class ItemController {
       throw new Exception('Item title cannot be empty');
     }
   }
-
+  /**
+   * Get Item by title from request.
+   * This function should never be used to modify an item.
+   * @param Request $request
+   * @return Item Detached item object.
+   */
   public function getItemByTitle(Request $request) {
     $pathTitle = $this->getPathMatchFromTitle($request);
     // Preparing query
@@ -70,7 +75,9 @@ class ItemController {
       ->setParameter(':path', $pathTitle);
     // Execute query
     $query = $qb->getQuery();
-    return $query->getSingleResult();
+    $item = $query->getSingleResult();
+    Db::get()->detach($item);
+    return $item;
   }
 
   /**
