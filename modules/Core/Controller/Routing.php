@@ -6,6 +6,8 @@ use Throwable;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\RequestContext;
 use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Event\RoutingEvent;
 use MyTravel\Core\CoreEvents;
@@ -25,6 +27,8 @@ final class Routing implements ServiceFactoryInterface {
    * @var Symfony\Component\Routing\RouteCollection
    */
   private $routes;
+  private $pathGenerator;
+  private $routeGenerator;
 
   protected function __construct() {
     
@@ -36,6 +40,14 @@ final class Routing implements ServiceFactoryInterface {
    */
   public static function get() {
     return App::service()->get('routing');
+  }
+
+  public function path($name, $params = array()) {
+    return $this->pathGenerator->generate($name, $params);
+  }
+
+  public function routePath($name, $params = array()) {
+    return trim($this->routeGenerator->generate($name, $params), '/');
   }
 
   /**
@@ -85,6 +97,15 @@ final class Routing implements ServiceFactoryInterface {
     }
   }
 
+  private function setUrlGenerators() {
+    $context = new RequestContext();
+    $context->fromRequest(App::get()->getRequest());
+    $this->pathGenerator = new UrlGenerator($this->routes(), $context);
+    $context = clone $context;
+    $context->setBaseUrl('');
+    $this->routeGenerator = new UrlGenerator($this->routes(), $context);
+  }
+
   /**
    * Update routing from config
    */
@@ -105,6 +126,8 @@ final class Routing implements ServiceFactoryInterface {
           ->setPath($config['path']);
       }
     }
+    // Now that we have proper routes, set url generators
+    $this->setUrlGenerators();
   }
 
   /**
