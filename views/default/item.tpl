@@ -14,7 +14,7 @@
   </article>
   <aside>
     {% for item in itemList %}
-    <a href="{{basepath}}/{{item.path}}">{{item.title}}</a><br>
+    <a href="{{path('item', {title:item.path})}}">{{item.title}}</a><br>
     {% endfor %}
   </aside>
 </div>

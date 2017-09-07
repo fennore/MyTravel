@@ -9,8 +9,11 @@ use MyTravel\Timeline\Model\TimelineItem;
 use MyTravel\Core\Event\IdListEvent;
 
 class TimelineItemController {
+
   /**
    * Callback for removed files listener
+   * @todo check if this can be executed on Item itself and moved to Core,
+   * instead of using hook.
    * @param IdListEvent $event
    */
   public function cleanGhostFiles(IdListEvent $event) {

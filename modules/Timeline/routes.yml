@@ -1,12 +1,3 @@
-imgfileview:
-  path: img/{title}/{trailing}
-  methods: GET
-  schemes: https
-  defaults: 
-    _controller: MyTravel\Core\Controller\Image::view
-    _format: image/*
-    _type: MyTravel\Timeline\Model\TimelineItem
-    trailing:
 timeline:
   path: timeline/{title}
   methods: GET

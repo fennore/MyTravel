@@ -39,6 +39,12 @@ trait SourceItem {
     parent::__set($name, $value);
   }
 
+  /**
+   * Overwrite default Doctrine setFile,
+   * So we can set the Item title according to file name,
+   * when empty.
+   * @param File $file
+   */
   public function setFile(File $file) {
     $this->file = $file;
     // Update title
@@ -47,6 +53,9 @@ trait SourceItem {
     }
   }
 
+  /**
+   * Remove File from Item
+   */
   public function detachFile() {
     unset($this->file);
   }

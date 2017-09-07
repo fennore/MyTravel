@@ -33,8 +33,11 @@ class PageFactory {
     $template = array(
       'item.tpl'
     );
-    if (!empty($item)) {
-      array_unshift($template, 'item-' . $item->getType() . '.tpl');
+    if (!empty($request->attributes->get('_type'))) {
+      // Dummy item
+      $classCall = $request->attributes->get('_type');
+      $dummy = new $classCall();
+      array_unshift($template, 'item-' . $dummy->getType() . '.tpl');
     }
     // Set data
     $variables = array(

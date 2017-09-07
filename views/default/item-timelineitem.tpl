@@ -11,13 +11,13 @@
       </h1>
     </header>
     <figure>
-      <img src="{{basepath}}/{{item.imagepath}}" />
+      <img src="{{path('img', {title:item.path})}}" />
       {{item.content}}
     </figure>
   </article>
   <aside>
     {% for item in itemList %}
-    <a href="{{basepath}}/{{item.path}}"><img src="{{basepath}}/{{item.imagepath}}/thumbnail" /> {{item.title}}</a><br>
+    <a href="{{path('timeline', {title:item.path})}}"><img src="{{path('img', {title:item.path})}}/thumbnail" /> {{item.title}}</a><br>
     {% endfor %}
   </aside>
 </div>

@@ -6,6 +6,7 @@ use ErrorException;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
+use Twig\TwigFunction;
 use MyTravel\Core\OutputInterface;
 use MyTravel\Core\TemplateInterface;
 
@@ -13,8 +14,17 @@ use MyTravel\Core\TemplateInterface;
  *
  */
 class Theming implements OutputInterface {
-
+  /**
+   *
+   * @var Twig\Environment
+   */
   private $themer;
+
+  /**
+   *
+   * @var string
+   */
+  private $themeDirectory;
 
   /**
    * Load the themer.
@@ -25,16 +35,25 @@ class Theming implements OutputInterface {
    */
   public function __construct() {
     // get theme from config
-    $themingDirectory = Config::get()->directories['views'] . '/' . Config::get()->view;
-    $svgSpritePath = $themingDirectory . '/img/sprite.svg';
-    $loader = new FilesystemLoader($themingDirectory);
+    $this->themeDirectory = Config::get()->directories['views'] . '/' . Config::get()->view;
+    $loader = new FilesystemLoader($this->themeDirectory);
     $this->themer = new Environment($loader);
     // Add global variables
+    $this->addGlobals();
+    $this->addFunctions();
+  }
+
+  private function addGlobals() {
+    $svgSpritePath = $this->themeDirectory . '/img/sprite.svg';
     $this->themer->addGlobal('canEdit', App::get()->hasAccess());
     $this->themer->addGlobal('basepath', App::get()->basePath());
     if (\file_exists($svgSpritePath)) {
       $this->themer->addGlobal('svgsprite', \file_get_contents($svgSpritePath));
     }
+  }
+
+  private function addFunctions() {
+    $this->themer->addFunction(new TwigFunction('path', array(Routing::get(), 'path')));
   }
 
   /**

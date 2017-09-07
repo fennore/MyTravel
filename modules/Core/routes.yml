@@ -12,7 +12,7 @@ about:
   defaults:
     _controller: MyTravel\Core\Controller\PageFactory::viewAboutPage
     _format: html
-itemview:
+item:
   path: item/{title}
   methods: GET
   schemes: https
@@ -21,6 +21,15 @@ itemview:
     _format: html
     _type: MyTravel\Core\Model\Item
     title:
+img:
+  path: img/{title}/{trailing}
+  methods: GET
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\Image::view
+    _format: image/*
+    _type: MyTravel\Core\Model\Item
+    trailing:
 itemapi:
   path: api/item/{offset}/{length}
   methods: GET
