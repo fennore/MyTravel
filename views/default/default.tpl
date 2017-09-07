@@ -17,6 +17,25 @@
       </article>
     </div>
     {% endblock %}
+    <div id="menu">
+      {% block menu %}
+      <a href="{{basepath}}" title="Home">
+        Home
+      </a> - 
+      <a href="{{basepath}}/story" title="Stories">
+        Stories
+      </a> - 
+      <a href="{{basepath}}/timeline" title="Timeline">
+        Timeline
+      </a> - 
+      <a href="{{basepath}}/locations" title="Locations">
+        Locations
+      </a> - 
+      <a href="{{basepath}}/about" title="About">
+        About
+      </a>
+      {% endblock %}
+    </div>
     {% block footer %}
     <!-- script tags can go here -->
     {% endblock %}
