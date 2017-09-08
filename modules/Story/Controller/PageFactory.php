@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Timeline\Controller;
+namespace MyTravel\Story\Controller;
 
 use MyTravel\Core\Controller\App;
 use MyTravel\Core\Controller\FileController;
@@ -8,11 +8,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PageFactory {
 
-  public static function viewTimeline(Request $request) {
-    // Sync timeline items
+  public static function viewStory(Request $request) {
+    // Sync story items
     if (App::get()->inDevelopment()) {
       $controller = new FileController();
-      $controller->sync('MyTravel\Timeline\Model\TimelineItem');
+      $controller->sync('MyTravel\Story\Model\Story');
     }
     // Do the Core PageFactory thing
     return \MyTravel\Core\Controller\PageFactory::viewItemPage($request);

@@ -3,7 +3,7 @@ story:
   methods: GET
   schemes: https
   defaults:
-    _controller: MyTravel\Core\Controller\PageFactory::viewItemPage
+    _controller: MyTravel\Story\Controller\PageFactory::viewStory
     _type: MyTravel\Story\Model\Story
     _format: html
     title:

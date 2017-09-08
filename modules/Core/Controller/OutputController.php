@@ -91,6 +91,9 @@ class OutputController {
       $lastModCheck = empty($response->getLastModified());
       if ($methodCheck) {
         $response
+          /**
+           * Set max age as shared (public) for CDN support
+           */
           ->setSharedMaxAge(60 * 60 * 24) //
           ->setExpires(new DateTime('1 day'));
       }
