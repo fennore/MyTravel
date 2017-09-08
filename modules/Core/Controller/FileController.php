@@ -42,8 +42,9 @@ class FileController {
    * @throws ErrorException
    */
   public function sync($itemTypeClass) {
-    $uses = class_uses($itemTypeClass);
-    if ($uses === false || !in_array('MyTravel\Core\ImageSource', $uses)) {
+    $implements = class_implements($itemTypeClass);
+    //
+    if ($implements === false || !in_array('MyTravel\Core\SourceItemInterface', $implements)) {
       throw new ErrorException('Files sync should only be called for Items using the SourceItem trait.');
     }
     // 1. Sync files with db
@@ -52,7 +53,7 @@ class FileController {
     $this->cleanGhostFiles($removedIdList, $itemTypeClass);
     // 3. Source Items with files
     // - get Files
-    $fileList = $this->getFiles($itemTypeClass::MIMEMATCH);
+    $fileList = $this->getFiles($itemTypeClass::matchMime());
     // - get Source Items
     $ctrlItem = new ItemController($itemTypeClass);
     $itemList = $ctrlItem->getItemList();

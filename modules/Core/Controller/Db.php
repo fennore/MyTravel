@@ -145,7 +145,6 @@ final class Db implements ServiceFactoryInterface {
     $updateSchemaSql = $this->diffSafeSql(
       $connection->getDatabasePlatform(), $fromSchema, $toSchema
     );
-
     foreach ($updateSchemaSql as $sql) {
       $connection->executeQuery($sql);
     }

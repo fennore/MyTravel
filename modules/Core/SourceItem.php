@@ -33,7 +33,7 @@ trait SourceItem {
   public function __set($name, $value) {
     // Do not change file manually
     if ($name === 'file') {
-      // @todo maybe set notification file can not be changed manually
+      // @todo maybe set notification: file can not be changed manually
       return;
     }
     parent::__set($name, $value);
@@ -58,6 +58,18 @@ trait SourceItem {
    */
   public function detachFile() {
     unset($this->file);
+  }
+
+  /**
+   * Returns MIME types to match in a query.
+   * Use a string for LIKE match, ex: text/%
+   * Use an array for exact IN match.
+   * The function returns self::MIMEMATCH by default.
+   * Preferably just add class constant MIMEMATCH to your class using this trait.
+   * @return string|array
+   */
+  public static function matchMime() {
+    return self::MIMEMATCH;
   }
 
 }

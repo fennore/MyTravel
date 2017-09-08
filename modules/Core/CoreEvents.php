@@ -8,6 +8,10 @@ class CoreEvents {
   const DIRCONFIG = 'config.application.directories';
   const DBCONFIG = 'config.database';
   const BUILDROUTES = 'routing.routes.build';
+
+  /**
+   * @deprecated As in not used anymore anywhere
+   */
   const RMFILES = 'files.removed';
 
 }
