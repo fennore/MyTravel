@@ -15,7 +15,7 @@ class FileController {
    * @param string|array $mimeMatch
    * @return Result array
    */
-  private function getFiles($mimeMatch) {
+  public function getFiles($mimeMatch) {
     $qb = Db::get()->createQueryBuilder();
     if (is_string($mimeMatch)) {
       $expr = $qb
