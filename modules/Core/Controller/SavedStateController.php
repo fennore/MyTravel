@@ -6,6 +6,10 @@ use MyTravel\Core\Model\SavedState;
 
 class SavedStateController {
 
+  public static function create() {
+    return new self();
+  }
+
   /**
    * Get SavedState matching given key parameter
    * @param int $key State identifier
@@ -19,8 +23,7 @@ class SavedStateController {
       ->where($qb->expr()->eq('s.key', ':key'))
       ->setParameter(':key', $key);
     $savedState = $qb->getQuery()->getOneOrNullResult() ?? new SavedState($key);
-    Db::get()->persist($savedState);
-    return $savedState;
+    return Db::get()->merge($savedState);
   }
 
 }

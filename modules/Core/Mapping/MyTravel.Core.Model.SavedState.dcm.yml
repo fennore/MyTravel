@@ -9,3 +9,5 @@ MyTravel\Core\Model\SavedState:
   fields:
     state:
       type: json
+  lifecycleCallbacks:
+    postLoad: [ postLoad ]
