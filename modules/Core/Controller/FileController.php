@@ -5,7 +5,6 @@ namespace MyTravel\Core\Controller;
 use ErrorException;
 use Symfony\Component\Finder\Finder;
 use MyTravel\Core\Model\File;
-use Doctrine\ORM\Query\Expr;
 
 class FileController {
 

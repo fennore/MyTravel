@@ -28,7 +28,7 @@ final class Db implements ServiceFactoryInterface {
   /**
    * Short alias for App::service()->get('db')->dbConnectionName
    * @param string $name database connection name you gave when connecting
-   * @return Doctrine\ORM\EntityManager
+   * @return Doctrine\ORM\EntityManager EntityManager
    */
   public static function get($name = 'sqlite') {
     return App::service()->get('db')->$name;
