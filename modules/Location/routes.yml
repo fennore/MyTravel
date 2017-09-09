@@ -1,0 +1,16 @@
+locations:
+  path: locations/{stage}
+  methods: GET
+  schemes: https
+  defaults:
+    _controller: MyTravel\Location\Controller\PageFactory::viewLocations
+    _type: MyTravel\Location\Model\Location
+    _format: html
+    stage: 0
+encodedroute:
+  path: api/encodedroute
+  methods: GET
+  schemes: https
+  defaults:
+    _controller: MyTravel\Location\Controller\RouteController::getEncodedRoute
+    _format: json
