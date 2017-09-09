@@ -121,7 +121,7 @@ class ItemController {
     $expr = $qb
       ->expr()
       ->andX(
-      $qb->expr()->eq('i.status', ':status')
+        $qb->expr()->eq('i.status', ':status')
     );
 
     $qb

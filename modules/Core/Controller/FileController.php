@@ -14,24 +14,26 @@ class FileController {
    * @param string|array $mimeMatch
    * @return Result array
    */
-  public function getFiles($mimeMatch) {
+  public function getFiles($mimeMatch, $pathMatch = '') {
     $qb = Db::get()->createQueryBuilder();
-    if (is_string($mimeMatch)) {
-      $expr = $qb
-        ->expr()
-        ->like('f.type', ':type');
-    } else if (is_array($mimeMatch)) {
-      $expr = $qb
-        ->expr()
-        ->in('f.type', ':type');
-    }
+    // Build base query
     $qb
       ->select('f')
-      ->from('MyTravel\Core\Model\File', 'f')
-      ->where($expr)
-      ->setParameter(':type', $mimeMatch);
-    $query = $qb->getQuery();
-    return $query->getResult();
+      ->from('MyTravel\Core\Model\File', 'f');
+    // Build Expr
+    if (is_string($mimeMatch)) {
+      $expr = $qb->expr()->like('f.type', ':type');
+    } else if (is_array($mimeMatch)) {
+      $expr = $qb->expr()->in('f.type', ':type');
+    }
+    $qb->setParameter(':type', $mimeMatch);
+    if (!empty($pathMatch)) {
+      $expr = $qb->expr()->andX($expr, $qb->expr()->eq('f.path', ':path'));
+      $qb->setParameter(':path', $pathMatch);
+    }
+    // Set WHERE
+    $qb->where($expr);
+    return $qb->getQuery()->getResult();
   }
 
   /**
@@ -83,7 +85,7 @@ class FileController {
    * @return array List of File ids that got deleted.
    */
   public function syncSources() {
-    // Select all files from db
+    // Select all files from db in array format
     $qb = Db::get()->createQueryBuilder();
     $dbFiles = $qb
       ->select('f')
@@ -95,19 +97,18 @@ class FileController {
     $dirFiles = Finder::create()
       ->files()
       ->in(Config::get()->directories['files']);
-    $batchSize = 50;
     $i = 0;
     foreach ($dirFiles as $splFile) {
       $id = array_search($splFile->getRelativePathname(), $dbFileSources);
       if ($id !== false) {
-        // skip already recorded files
+        // Skip already recorded files
         unset($dbFileSources[$id]);
         continue;
       }
       ++$i;
       $file = new File($splFile);
       Db::get()->persist($file);
-      if (($i % $batchSize) === 0) {
+      if (($i % Db::BATCHSIZE) === 0) {
         Db::get()->flush();
         Db::get()->clear(); // Detaches all objects from Doctrine!
       }

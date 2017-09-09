@@ -12,7 +12,13 @@ use MyTravel\Core\Model\Module;
 use MyTravel\Core\Event\DbServiceEvent;
 use MyTravel\Core\CoreEvents;
 
+/**
+ * @todo check for using more performant list iteration?
+ * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html#iterating-large-results-for-data-processing
+ */
 final class Db implements ServiceFactoryInterface {
+
+  const BATCHSIZE = 50;
 
   protected static $dbServiceController;
   protected $connection;
