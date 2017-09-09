@@ -33,7 +33,6 @@ class LocationEntityController {
    * Each GPX file represents a new stage.
    */
   public function sync() {
-    $persistState = false;
     // 1. Sync files
     $ctrlFile = new FileController();
     $ctrlFile->syncSources();
@@ -41,34 +40,26 @@ class LocationEntityController {
     // Take this straight from db since stages can be added manually.
     $lastStage = $this->getLastStage();
     // 3. Get savedState
-    $ctrlState = new SavedStateController();
+    $ctrlState = SavedStateController::create();
     $savedState = $ctrlState->get(self::STATESYNC);
-    // Detach savedState because we are gonna write some stuff to db first!
+    // Detach savedState skipping flushes
     Db::get()->detach($savedState);
-    $newState = (object) $savedState->getState();
-    if (empty($newState)) {
-      $persistState = true;
-    }
     // 4. Add any locations from new files to subsequent stages.
-    $files = $ctrlFile->getFiles('application/xml');
+    // - path is expected to be subpath of files directory
+    //   anything else can be considered invalid anyway
+    $path = str_replace(Config::get()->directories['files'] . '/', '', Config::get()->directories['gpx']);
+    $files = $ctrlFile->getFiles('application/xml', $path);
     foreach ($files as $file) {
-      $duplicateCheck = in_array($file->id, $newState->readFiles ?? array());
-      $directoryCheck = Config::get()->directories['files'] . '/' . $file->path === Config::get()->directories['gpx'];
-      if ($duplicateCheck || !$directoryCheck) {
+      $duplicateCheck = in_array($file->id, $savedState->get('readFiles') ?? array());
+      if ($duplicateCheck) {
         continue;
       }
       $reader = new GpxReader($file);
-      $reader->saveGpxAsLocations(++$lastStage);
-      $newState->readFiles[] = $file->id;
+      $reader->saveGpxAsLocations( ++$lastStage);
+      $savedState->add('readFiles', $file->id);
     }
-    // 5. Save state
-    // Merge savedState
-    $savedState->setState($newState);
-    if ($persistState) {
-      Db::get()->persist($savedState);
-    } else {
-      Db::get()->merge($savedState);
-    }
+    Db::get()->merge($savedState);
+    // 5. Flush
     Db::get()->flush();
     Db::get()->clear();
   }

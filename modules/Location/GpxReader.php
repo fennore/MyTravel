@@ -17,7 +17,6 @@ class GpxReader {
    * @param int $stage Which stage GPX locations belong to.
    */
   public function saveGpxAsLocations($stage) {
-    $batchSize = 50;
     $xml = (array) \simplexml_load_file($this->file->getFullSource(), null, LIBXML_NOCDATA);
     // Validate gpx file
     if (empty($xml['wpt']) || !is_array($xml['wpt'])) {
@@ -35,7 +34,7 @@ class GpxReader {
         'stage' => $stage
       ));
       Db::get()->persist($location);
-      if (($i % $batchSize) === 0) {
+      if (($i % Db::BATCHSIZE) === 0) {
         Db::get()->flush();
       }
     }
