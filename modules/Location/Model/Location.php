@@ -13,12 +13,21 @@ class Location {
 
   public function __construct($data) {
     $this->coordinate = new Coordinate();
-    $this->coordinate->setLat((float) $data['lat']);
-    $this->coordinate->setLng((float) $data['lng']);
+    $this->coordinate
+      ->setLat((float) $data['lat'])
+      ->setLng((float) $data['lng']);
     $this->info = $data['info'];
     $this->weight = (int) $data['weight'];
     $this->status = (int) $data['status'];
     $this->stage = (int) $data['stage'];
+  }
+
+  public function getStage() {
+    return (int) $this->stage;
+  }
+
+  public function __toString() {
+    return (string) $this->coordinate;
   }
 
 }

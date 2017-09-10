@@ -2,124 +2,120 @@
 
 namespace MyTravel\Location\Controller;
 
+use MyTravel\Core\Controller\Db;
+use MyTravel\Core\Controller\SavedStateController;
+use MyTravel\Location\GapiHelper;
+use MyTravel\Location\Model\Direction;
+use MyTravel\Location\Model\GapiDirectionRequest;
+use Doctrine\ORM\Query\Expr;
+
 class RouteController {
 
   const STATEROUTE = 874;
   const STATEDIRECTIONS = 589;
 
-  public function getGoogleDirections(&$status, &$encodedRoutes) {
-    $insertValues = array();
+  /**
+   * Maximum amount of locations sent per 1 direction request
+   * @see https://developers.google.com/maps/documentation/javascript/directions#UsageLimits
+   */
+  const REQUESTSIZE = 25;
 
-    $db = 'direction';
-    $countColumns = count(DbInfoMytravel::$dbTables[$db]['cols']);
+  /**
+   * Because it's a lucky number? Nothing can ever go wrong!
+   */
+  const MAXREQUESTS = 13;
 
-    //handle routes-status file
-    $limit = self::CHUNKSIZE * self::MAXREQUESTS;
-    $query = 'SELECT * FROM location WHERE weight >= ? AND stage = ? ORDER BY weight ASC LIMIT ?';
-    $params = array(
-      (int) $status->weight,
-      (int) $status->stage,
-      $limit
+  public function calculateEncodedRoute() {
+    // 1. Get states
+    $stateCtrl = new SavedStateController();
+    $directionState = $stateCtrl->get(self::STATEDIRECTIONS);
+    $routeState = $stateCtrl->get(self::STATEROUTE);
+    // 2. Get Locations
+    $qb = Db::get()->createQueryBuilder();
+    $expr = $qb->expr()->andX(
+      $qb->expr()->gte('l.weight', ':weight'), $qb->expr()->eq('l.stage', ':stage')
     );
-    $sth = $this->dbHandler->prepare($query);
-    $sth->execute($params);
-    $wpts = $sth->fetchAll(PDO::FETCH_ASSOC);
-    $numResults = count($wpts);
-
-    // Stop execution when no new waypoints are available
-    if (empty($wpts) || $numResults < 2) {
-      $status->weight = 0;
-      $status->stage++;
-      return;
-    }
-
+    $qb
+      ->select('l')
+      ->from('\MyTravel\Location\Model\Location', 'l')
+      ->where($expr)
+      ->setParameter(':weight', $directionState->weight ?? 0)
+      ->setParameter(':stage', $directionState->stage ?? 1)
+      ->orderBy('l.weight', 'ASC')
+      // First request can have 25 new locations, rest 24.
+      // Because we reuse the destination as origin for consecutive requests.
+      ->setMaxResults((self::REQUESTSIZE - 1) * self::MAXREQUESTS + 1)
+    ;
+    $locationList = $qb->getQuery()->getResult();
+    // 3. Directions
+    $directionList = $this->getGoogleDirections($locationList);
+    // 4. Encoded route
+    // @todo Loop through directions, persist them, and build encodedRoute (SavedState)
+    //  routes are listed per stage
     //$encodedRoutes = array_merge(array_diff_key(array_pad(array(), (int) $status->stage + 1, array()), (array) $encodedRoutes), (array) $encodedRoutes);
-    $encodedRoutes = array_pad($encodedRoutes, (int) $status->stage + 1, array());
-
-    while (!empty($wpts)) {
-
-      $modes = array(
-        'bicycling', // 24
-        'bicycling', // 6
-        'walking',
-        'driving'
-      );
-      // The origin must always be the same for every travel mode
-      if (empty($destination)) {
-        $origin = array_shift($wpts);
-      } else {
-        $origin = $destination;
-      }
-      // Reset request waypoints size
-      $size = self::CHUNKSIZE;
-      do {
-        $mode = array_shift($modes);
-
-        if (count($wpts) === $size + 1 && empty($destination)) {
-          --$size;
-        }
-
-        $coordinates = array_slice($wpts, 0, $size);
-
-        $destination = array_pop($coordinates);
-        // @todo use coordinate as object with class, and let it have __tostring function for this (also tojson etc.)
-        $coordinates = array_map(function($coordinate) {
-          return $coordinate['lat'] . ',' . $coordinate['lng'];
-        }, $coordinates);
-
-        $arrQuery = array(
-          'mode' => $mode,
-          'origin' => (float) $origin['lat'] . ',' . (float) $origin['lng'], // urlencode('51.05423,3.66161')
-          'destination' => (float) $destination['lat'] . ',' . (float) $destination['lng'],
-          'waypoints' => 'via:' . (implode('|via:', $coordinates)), //$polylineEncoder->encodedString()
-          'avoid' => 'ferries|tolls|highways',
-          'key' => App::GAPIkey,
-        );
-
-        $url = App::GAPIurl . '?' . http_build_query($arrQuery);
-        // Get cURL resource
-        $curl = curl_init();
-        // Set some options - we are passing in a useragent too here
-        curl_setopt_array($curl, array(
-          CURLOPT_RETURNTRANSFER => 1,
-          CURLOPT_URL => $url,
-          CURLOPT_SSL_VERIFYPEER => false, // ssl verification seems to fail
-        ));
-
-        // Send the request & save response to $resp
-        $resp = curl_exec($curl);
-        $respObj = json_decode($resp);
-        // Close request to clear up some resources
-        curl_close($curl);
-        // Set request size smaller as we did not get the desired first request
-        if (empty($respObj->routes)) {
-          $size = 6; // 5 + 1
-        }
-        usleep(100);
-      } while (empty($respObj->routes) && !empty($modes));
-
-      array_splice($wpts, 0, $size);
-
-      // Prepare all values
-      //@todo https://stackoverflow.com/questions/16180104/get-a-polyline-from-google-maps-directions-v3
-      if (!empty($respObj->routes)) {
-        $insertValues[] = (int) $status->stage; //stage
-        $insertValues[] = (float) $origin['id']; //origin = location id
-        $insertValues[] = (float) $destination['id']; //destination = location id
-        $insertValues[] = (string) $resp; //blob = direction response
-        array_push($encodedRoutes[(int) $status->stage], (string) $respObj->routes[0]->overview_polyline->points);
-      }
-    }
-
-    if ($numResults < $limit) {
+    
+    /* $encodedRoutes = array_pad($encodedRoutes, (int) $status->stage + 1, array());
+      if ($numResults < $limit) {
       $status->weight = 0;
       $status->stage++;
-    } else {
+      } else {
       $status->weight = $destination['weight'];
-    }
+      }
 
-    $placeholders = array_fill(0, count($insertValues) / $countColumns, implode(',', array_fill(0, $countColumns, '?')));
-    $this->multiInsert($insertValues, $placeholders, $db);
+      $placeholders = array_fill(0, count($insertValues) / $countColumns, implode(',', array_fill(0, $countColumns, '?')));
+      $this->multiInsert($insertValues, $placeholders, $db); */
+
+    // 5. Flush?
+  }
+
+  public function getGoogleDirections($locationList) {
+    $directionList = array();
+    // Stop execution when not enough waypoints are available
+    if (empty($locationList) || count($locationList) < 2) {
+      return $directionList;
+    }
+    // Set first origin
+    $origin = array_shift($locationList);
+    $setBack = 0;
+    while (!empty($locationList)) {
+
+      $modes = GapiHelper::DIRECTIONMODES;
+      // Note: the origin must always be the same for every travel mode
+      do {
+        $modeSet = array_shift($modes);
+        $mode = key($modeSet);
+        $size = (current($modeSet) ?? self::REQUESTSIZE) - $setBack;
+
+        $listChunk = array_slice($locationList, 0, $size);
+        $destination = array_pop($listChunk);
+        $directionRequest = new GapiDirectionRequest();
+        array_map(array($directionRequest, 'addWaypoint'), $listChunk);
+        $response = $directionRequest
+          ->setMode($mode)
+          ->setOrigin($origin)
+          ->setDestination($destination)
+          ->setAvoid('ferries|tolls|highways')
+          ->getDirections();
+      } while (empty($response->routes) && !empty($modes));
+
+      array_splice($locationList, 0, $size);
+      // Set next origin as last destination
+      $origin = $destination;
+      // From now on we reuse one location so we need one less from locationList
+      $setBack = 1;
+      // Prepare all values
+      // @todo https://stackoverflow.com/questions/16180104/get-a-polyline-from-google-maps-directions-v3
+      if (!empty($response->routes)) {
+        $direction = new Direction();
+        $direction
+          ->setOrigin($origin)
+          ->setDestination($destination)
+          ->setStage($origin->getStage())
+          ->setData($response);
+        array_push($directionList, $direction);
+      }
+    }
+    return $directionList;
   }
 
 }

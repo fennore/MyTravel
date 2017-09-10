@@ -11,11 +11,13 @@ class PageFactory {
   public static function viewLocations(Request $request) {
     // Sync story items
     if (App::get()->inDevelopment()) {
-      $ctrl = new LocationEntityController();
-      $ctrl->sync();
+      $ctrlLocations = new LocationEntityController();
+      $ctrlLocations->sync();
+      $ctrlRoute = new RouteController();
+      $ctrlRoute->calculateEncodedRoute();
     }
 
-    // return new Page();
+    return new Page();
   }
 
 }
