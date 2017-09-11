@@ -3,7 +3,7 @@
 {% block title %}{{item.title}}{% endblock %}
 
 {% block content %}
-<div id="content">
+<main id="content">
   <article>
     <header>
       <h1>
@@ -15,10 +15,10 @@
       {{item.content}}
     </figure>
   </article>
-  <aside>
-    {% for item in itemList %}
-    <a href="{{path('timeline', {title:item.path})}}"><img src="{{path('img', {title:item.path})}}/thumbnail" /> {{item.title}}</a><br>
-    {% endfor %}
-  </aside>
-</div>
+</main>
+<nav>
+  {% for item in itemList %}
+  <a href="{{path('timeline', {title:item.path})}}"><img src="{{path('img', {title:item.path})}}/thumbnail" /> {{item.title}}</a> 
+  {% endfor %}
+</nav>
 {% endblock %}

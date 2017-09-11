@@ -3,7 +3,7 @@
 {% block title %}{{item.title}}{% endblock %}
 
 {% block content %}
-<div id="content">
+<main id="content">
   <article>
     <header>
       <h1>
@@ -12,10 +12,10 @@
     </header>
     {{item.content|striptags('<br>')|raw}}
   </article>
-  <aside>
-    {% for item in itemList %}
-    <a href="{{path('story', {title:item.path})}}">{{item.title}}</a><br>
-    {% endfor %}
-  </aside>
-</div>
+</main>
+<nav>
+  {% for item in itemList %}
+  <a href="{{path('story', {title:item.path})}}">{{item.title}}</a> 
+  {% endfor %}
+</nav>
 {% endblock %}

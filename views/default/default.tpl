@@ -9,33 +9,23 @@
   </head>
   <body>
     {% block content %}
-    <div id="content">
+    <main id="content">
       <article>
         <p>
           It's a page!
         </p>
       </article>
-    </div>
+    </main>
     {% endblock %}
-    <div id="menu">
+    <nav id="menu">
       {% block menu %}
-      <a href="{{basepath}}" title="Home">
-        Home
-      </a> - 
-      <a href="{{basepath}}/story" title="Stories">
-        Stories
-      </a> - 
-      <a href="{{basepath}}/timeline" title="Timeline">
-        Timeline
-      </a> - 
-      <a href="{{basepath}}/locations" title="Locations">
-        Locations
-      </a> - 
-      <a href="{{basepath}}/about" title="About">
-        About
-      </a>
+      <a href="{{basepath}}" title="Home">Home</a> 
+      <a href="{{basepath}}/story" title="Stories">Stories</a> 
+      <a href="{{basepath}}/timeline" title="Timeline">Timeline</a> 
+      <a href="{{basepath}}/locations" title="Locations">Locations</a> 
+      <a href="{{basepath}}/about" title="About">About</a> 
       {% endblock %}
-    </div>
+    </nav>
     {% block footer %}
     <!-- script tags can go here -->
     {% endblock %}

@@ -1,11 +1,11 @@
 {% extends "default.tpl" %}
 
 {% block content %}
-  <div id="content">
+  <main id="content">
     <article>
       <p>
         I am the homepage
       </p>
     </article>
-  </div>
+  </main>
 {% endblock %}

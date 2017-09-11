@@ -7,11 +7,11 @@
 {% endblock %}
 
 {% block content %}
-<div id="content">
+<main id="content">
   <article>
     <p>
       It's about something alright!
     </p>
   </article>
-</div>
+</main>
 {% endblock %}
