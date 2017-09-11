@@ -14,7 +14,7 @@ class PageFactory {
       $ctrlLocations = new LocationEntityController();
       $ctrlLocations->sync();
       $ctrlRoute = new RouteController();
-      $ctrlRoute->calculateEncodedRoute();
+      $ctrlRoute->buildEncodedRoute();
     }
 
     return new Page();

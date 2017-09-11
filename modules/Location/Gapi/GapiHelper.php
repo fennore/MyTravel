@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Location;
+namespace MyTravel\Location\Gapi;
 
 class GapiHelper {
 

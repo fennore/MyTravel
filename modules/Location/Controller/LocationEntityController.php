@@ -25,6 +25,25 @@ class LocationEntityController {
     return (int) $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_SINGLE_SCALAR);
   }
 
+  public function getStageLocations(int $stage, int $weight, $limit = 0) {
+    $qb = Db::get()->createQueryBuilder();
+    $expr = $qb->expr()->andX(
+      $qb->expr()->gte('l.weight', ':weight'), $qb->expr()->eq('l.stage', ':stage')
+    );
+    $qb
+      ->select('l')
+      ->from('\MyTravel\Location\Model\Location', 'l')
+      ->where($expr)
+      ->setParameter(':stage', $stage)
+      ->setParameter(':weight', $weight)
+      ->orderBy('l.weight', 'ASC');
+    // Optionally set limit
+    if (!empty($limit)) {
+      $qb->setMaxResults($limit);
+    }
+    return $qb->getQuery()->getResult();
+  }
+
   /**
    * Synchronize GPX files with Locations.
    * Keeps track of already read Files in application saveState.

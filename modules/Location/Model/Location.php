@@ -22,8 +22,24 @@ class Location {
     $this->stage = (int) $data['stage'];
   }
 
+  public function __get($name) {
+    return $this->name;
+  }
+
+  /**
+   * Get Location stage
+   * @return int
+   */
   public function getStage() {
     return (int) $this->stage;
+  }
+
+  /**
+   * Get Location weight
+   * @return int
+   */
+  public function getWeight() {
+    return (int) $this->weight;
   }
 
   public function __toString() {

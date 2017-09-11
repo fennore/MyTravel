@@ -9,7 +9,8 @@ class Config {
   public function application(ConfigNodeEvent $event) {
     $event
     ->node()
-    ->scalarNode('gapikey')->end();
+      ->scalarNode('directionsdriver')->defaultValue('\MyTravel\Location\Gapi\GapiDirectionsDriver')->end()
+      ->scalarNode('directionsdriveraccesskey')->end();
   }
 
   public function applicationDirectories(ConfigNodeEvent $event) {

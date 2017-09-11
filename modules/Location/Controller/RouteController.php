@@ -2,120 +2,124 @@
 
 namespace MyTravel\Location\Controller;
 
+use MyTravel\Core\Controller\Config;
 use MyTravel\Core\Controller\Db;
 use MyTravel\Core\Controller\SavedStateController;
-use MyTravel\Location\GapiHelper;
+use MyTravel\Location\Controller\LocationEntityController;
 use MyTravel\Location\Model\Direction;
-use MyTravel\Location\Model\GapiDirectionRequest;
-use Doctrine\ORM\Query\Expr;
 
+/**
+ * @todo make route controller independent from google
+ *       by using intermediate controller (driver?) implementing interface
+ *       to get direction data (no specifics of what direction data exactly is, can be many things)
+ *       which can be converted to polyline to print on a (google) map
+ */
 class RouteController {
 
   const STATEROUTE = 874;
   const STATEDIRECTIONS = 589;
 
   /**
-   * Maximum amount of locations sent per 1 direction request
-   * @see https://developers.google.com/maps/documentation/javascript/directions#UsageLimits
-   */
-  const REQUESTSIZE = 25;
-
-  /**
    * Because it's a lucky number? Nothing can ever go wrong!
    */
   const MAXREQUESTS = 13;
 
-  public function calculateEncodedRoute() {
+  /**
+   *
+   * @var \MyTravel\Location\DirectionsDriverInterface
+   */
+  private $driver;
+
+  /**
+   * Use a DirectionsDriver to calculate a route from Location entities.
+   * @param DirectionsDriverInterface $driver
+   *    Set custom Direction Driver or use from config.
+   *    Defaults to \MyTravel\Location\Gapi\GapiDirectionsDriver.
+   */
+  public function __construct(DirectionsDriverInterface $driver = null) {
+    if (empty($driver)) {
+      $directionsDriverClass = Config::get()->directionsdriver;
+      $driver = new $directionsDriverClass();
+    }
+    $this->driver = $driver;
+  }
+
+  /**
+   * The maximum amount of Location entities that will be used for direction requests.
+   * @return int
+   */
+  private function getLocationLimit() {
+    return (int) $this->driver->getRequestSize() * self::MAXREQUESTS;
+  }
+
+  /**
+   * Resets encoded route to certain point,
+   * so that it can be rebuild in chunks.
+   * @todo See if we can use some direction/location diff to perform a more accurate reset.
+   * @param int $stage
+   */
+  public function resetEncodedRoute(int $stage) {
+    // 1. Reset Direction SavedState to weight 0 and stage $stage
+    // 2. Update Route SavedState removing all encoded routes of stage $stage only
+  }
+
+  /**
+   * Build an encoded route in chunks from all Location entities.
+   * @return type
+   */
+  public function buildEncodedRoute() {
     // 1. Get states
     $stateCtrl = new SavedStateController();
     $directionState = $stateCtrl->get(self::STATEDIRECTIONS);
     $routeState = $stateCtrl->get(self::STATEROUTE);
+    $stage = (int) ($directionState->get('stage') ?? 1);
     // 2. Get Locations
-    $qb = Db::get()->createQueryBuilder();
-    $expr = $qb->expr()->andX(
-      $qb->expr()->gte('l.weight', ':weight'), $qb->expr()->eq('l.stage', ':stage')
+    $ctrl = new LocationEntityController();
+    $locationList = $ctrl->getStageLocations(
+      $stage
+      , $directionState->get('weight') ?? 0
+      , $this->getLocationLimit()
     );
-    $qb
-      ->select('l')
-      ->from('\MyTravel\Location\Model\Location', 'l')
-      ->where($expr)
-      ->setParameter(':weight', $directionState->weight ?? 0)
-      ->setParameter(':stage', $directionState->stage ?? 1)
-      ->orderBy('l.weight', 'ASC')
-      // First request can have 25 new locations, rest 24.
-      // Because we reuse the destination as origin for consecutive requests.
-      ->setMaxResults((self::REQUESTSIZE - 1) * self::MAXREQUESTS + 1)
-    ;
-    $locationList = $qb->getQuery()->getResult();
+    // - Stop processing when no locations are found and last stage is also empty
+    if (empty($locationList) && $stage > $ctrl->getLastStage()) {
+      return;
+    }
+    // - Stop processing when weight is 0 but there are already encoded route parts
+    if ($directionState->get('weight') === 0 && !empty($routeState->get($stage))) {
+      // Also set Direction SavedState to next stage
+      $directionState->set('stage', ++$stage);
+      Db::get()->flush();
+      Db::get()->clear();
+      return;
+    }
     // 3. Directions
-    $directionList = $this->getGoogleDirections($locationList);
+    $directionsList = $this->driver->getDirections($locationList, self::MAXREQUESTS);
     // 4. Encoded route
-    // @todo Loop through directions, persist them, and build encodedRoute (SavedState)
-    //  routes are listed per stage
-    //$encodedRoutes = array_merge(array_diff_key(array_pad(array(), (int) $status->stage + 1, array()), (array) $encodedRoutes), (array) $encodedRoutes);
-    
-    /* $encodedRoutes = array_pad($encodedRoutes, (int) $status->stage + 1, array());
-      if ($numResults < $limit) {
-      $status->weight = 0;
-      $status->stage++;
-      } else {
-      $status->weight = $destination['weight'];
-      }
+    $encodedRoute = array_map(array($this->driver, 'getPolyline'), $directionsList);
+    // 5. Set data for Db and Flush it
+    array_map(array(Db::get(), 'persist'), $directionsList);
+    array_map(
+      array($routeState, 'add')
+      , array_pad(array(), count($encodedRoute), $stage)
+      , $encodedRoute
+    );
 
-      $placeholders = array_fill(0, count($insertValues) / $countColumns, implode(',', array_fill(0, $countColumns, '?')));
-      $this->multiInsert($insertValues, $placeholders, $db); */
-
-    // 5. Flush?
-  }
-
-  public function getGoogleDirections($locationList) {
-    $directionList = array();
-    // Stop execution when not enough waypoints are available
-    if (empty($locationList) || count($locationList) < 2) {
-      return $directionList;
+    $lastLocation = array_pop($locationList);
+    $lastDirection = array_pop($directionsList);
+    $countCheck = count($locationList) < $this->getLocationLimit();
+    if ($lastDirection instanceof Direction) {
+      $lastDirectionLocation = $lastDirection->destination;
+      $locationCheck = $lastDirectionLocation == $lastLocation && $countCheck;
     }
-    // Set first origin
-    $origin = array_shift($locationList);
-    $setBack = 0;
-    while (!empty($locationList)) {
-
-      $modes = GapiHelper::DIRECTIONMODES;
-      // Note: the origin must always be the same for every travel mode
-      do {
-        $modeSet = array_shift($modes);
-        $mode = key($modeSet);
-        $size = (current($modeSet) ?? self::REQUESTSIZE) - $setBack;
-
-        $listChunk = array_slice($locationList, 0, $size);
-        $destination = array_pop($listChunk);
-        $directionRequest = new GapiDirectionRequest();
-        array_map(array($directionRequest, 'addWaypoint'), $listChunk);
-        $response = $directionRequest
-          ->setMode($mode)
-          ->setOrigin($origin)
-          ->setDestination($destination)
-          ->setAvoid('ferries|tolls|highways')
-          ->getDirections();
-      } while (empty($response->routes) && !empty($modes));
-
-      array_splice($locationList, 0, $size);
-      // Set next origin as last destination
-      $origin = $destination;
-      // From now on we reuse one location so we need one less from locationList
-      $setBack = 1;
-      // Prepare all values
-      // @todo https://stackoverflow.com/questions/16180104/get-a-polyline-from-google-maps-directions-v3
-      if (!empty($response->routes)) {
-        $direction = new Direction();
-        $direction
-          ->setOrigin($origin)
-          ->setDestination($destination)
-          ->setStage($origin->getStage())
-          ->setData($response);
-        array_push($directionList, $direction);
-      }
+    if (!isset($lastDirectionLocation) || $locationCheck) {
+      $directionState->set('weight', 0);
+      $directionState->set('stage', ++$stage);
+    } else {
+      $directionState->set('weight', $lastDirectionLocation->getWeight());
+      $directionState->set('stage', $stage);
     }
-    return $directionList;
+    Db::get()->flush();
+    Db::get()->clear();
   }
 
 }

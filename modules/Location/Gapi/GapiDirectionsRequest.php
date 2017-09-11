@@ -1,13 +1,12 @@
 <?php
 
-namespace MyTravel\Location\Model;
+namespace MyTravel\Location\Gapi;
 
 use ErrorException;
 use MyTravel\Core\Controller\Config;
-use MyTravel\Location\GapiHelper;
 use MyTravel\Location\Model\Location;
 
-class GapiDirectionRequest {
+class GapiDirectionsRequest {
 
   private $mode;
   private $origin;
@@ -43,10 +42,10 @@ class GapiDirectionRequest {
   }
 
   private function getKey() {
-    if (empty(Config::get()->gapikey)) {
-      throw new ErrorException('Requesting GAPI Directions when no Key has been set. Add gapikey to your config.yml');
+    if (empty(Config::get()->directionsdriveraccesskey)) {
+      throw new ErrorException('Requesting Google API Directions when no Key has been set. Add API key as directionsdriveraccesskey to your config.yml');
     }
-    return Config::get()->gapikey;
+    return Config::get()->directionsdriveraccesskey;
   }
 
   public function getDirections() {
