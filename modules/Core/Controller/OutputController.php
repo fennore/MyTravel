@@ -34,8 +34,8 @@ class OutputController {
         ->addListener(KernelEvents::REQUEST, array(self::$oc, 'defineOutput'));
       App::event()
         ->addListener(KernelEvents::VIEW, array(self::$oc, 'handleOutput'));
-      /* App::event()
-        ->addListener(KernelEvents::EXCEPTION, array(self::$oc, 'handleException')); */
+      App::event()
+        ->addListener(KernelEvents::EXCEPTION, array(self::$oc, 'handleException'));
     }
     return self::$oc;
   }
@@ -45,6 +45,14 @@ class OutputController {
    */
   public function defineOutput(GetResponseEvent $event) {
     $request = $event->getRequest();
+    // @todo replace with Symfony Security component (independent integration)
+    if (!in_array($request->getMethod(), array('GET', 'HEAD')) && !App::get()->hasAccess()) {
+      $theming = new Theming();
+      $response = new Response($theming->render('403.tpl', array()));
+      $response->setStatusCode(403);
+      $event->setResponse($response);
+      return;
+    }
     // check getFormat vs getRequestFormat
     // application/json as json
     if ($request->getRequestFormat() === 'json') {

@@ -7,6 +7,8 @@ locations:
     _type: MyTravel\Location\Model\Location
     _format: html
     stage: 1
+  requirements:
+    stage: '[0-9]+'
 encodedroute:
   path: api/encodedroute
   methods: GET
