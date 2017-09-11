@@ -22,6 +22,11 @@ final class Page implements TemplateInterface {
    */
   private $variables;
 
+  /**
+   *
+   * @param mixed $template string or array of template name (with extension and subdirectory)
+   * @param array $variables array of named variables to use in a template
+   */
   public function __construct($template, $variables) {
     $this->template = $template;
     $this->variables = $variables;
