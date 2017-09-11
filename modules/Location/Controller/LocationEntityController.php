@@ -17,7 +17,7 @@ class LocationEntityController {
    * Get the last recorded stage.
    * @return int
    */
-  private function getLastStage() {
+  public function getLastStage() {
     $qb = Db::get()->createQueryBuilder();
     $qb
       ->select('MAX(l.stage) AS lastStage')

@@ -6,7 +6,7 @@ locations:
     _controller: MyTravel\Location\Controller\PageFactory::viewLocations
     _type: MyTravel\Location\Model\Location
     _format: html
-    stage: 0
+    stage: 1
 encodedroute:
   path: api/encodedroute
   methods: GET
