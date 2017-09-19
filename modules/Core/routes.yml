@@ -70,11 +70,11 @@ jsbundle:
   schemes: https
   defaults:
     _controller: MyTravel\Core\Controller\Js::viewJsBundle
-    _format: js
+    _format: application/javascript
 cssbundle:
   path: css/bundle
   methods: GET
   schemes: https
   defaults:
     _controller: MyTravel\Core\Controller\Css::viewCssBundle
-    _format: css
+    _format: text/css

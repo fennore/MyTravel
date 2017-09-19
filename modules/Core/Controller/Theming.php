@@ -4,6 +4,12 @@ namespace MyTravel\Core\Controller;
 
 use ErrorException;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\Asset\Context\RequestStackContext;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\Asset\PathPackage;
+use Symfony\Component\Asset\UrlPackage;
+use Symfony\Component\Asset\Packages;
 use Twig\Loader\FilesystemLoader;
 use Twig\Environment;
 use Twig\TwigFunction;
@@ -25,6 +31,7 @@ class Theming implements OutputInterface {
    * @var string
    */
   private $themeDirectory;
+  private $assets;
 
   /**
    * Load the themer.
@@ -38,9 +45,31 @@ class Theming implements OutputInterface {
     $this->themeDirectory = Config::get()->directories['views'] . '/' . Config::get()->view;
     $loader = new FilesystemLoader($this->themeDirectory);
     $this->themer = new Environment($loader);
+    // Setup Assets
+    $this->setAssets();
     // Add global variables
     $this->addGlobals();
     $this->addFunctions();
+  }
+
+  private function setAssets() {
+    // CDN list
+    $cdnList = array(
+      'https://unpkg.com/'
+    );
+    // Context
+    $stack = new RequestStack();
+    $stack->push(App::get()->getRequest());
+    $context = new RequestStackContext($stack);
+    // Default package
+    $defaultPackage = new PathPackage($this->themeDirectory, new EmptyVersionStrategy(), $context);
+    // Named packages
+    $namedPackages = array(
+      'cdn' => new UrlPackage($cdnList, new EmptyVersionStrategy()),
+      'local' => $defaultPackage,
+    );
+
+    $this->assets = new Packages($defaultPackage, $namedPackages);
   }
 
   private function addGlobals() {
@@ -54,6 +83,7 @@ class Theming implements OutputInterface {
 
   private function addFunctions() {
     $this->themer->addFunction(new TwigFunction('path', array(Routing::get(), 'path')));
+    $this->themer->addFunction(new TwigFunction('asset', array($this->assets, 'getUrl')));
   }
 
   /**

@@ -19,6 +19,8 @@ $app
 // Add prefixes
 $app->addAutoloadPrefix('psr-4', 'Doctrine\\', 'lib/Doctrine/lib/Doctrine');
 $app->addAutoloadPrefix('psr-4', 'Twig\\', 'lib/Twig/src');
+$app->addAutoloadPrefix('psr-4', 'MatthiasMullie\Minify\\', 'lib/Minify/src');
+$app->addAutoloadPrefix('psr-4', 'Patchwork\\', 'lib/JSqueeze');
 // Oh my Twig what are you doing...
 $app->addAutoloadPrefix('psr-0', 'Twig_', 'lib/Twig/lib');
 // Register autoloaders

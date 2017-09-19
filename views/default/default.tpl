@@ -19,15 +19,16 @@
     {% endblock %}
     <nav id="menu">
       {% block menu %}
-      <a href="{{basepath}}" title="Home">Home</a> 
-      <a href="{{basepath}}/story" title="Stories">Stories</a> 
-      <a href="{{basepath}}/timeline" title="Timeline">Timeline</a> 
-      <a href="{{basepath}}/locations" title="Locations">Locations</a> 
-      <a href="{{basepath}}/about" title="About">About</a> 
+      <a href="{{path('home')}}" title="Home">Home</a> 
+      <a href="{{path('story')}}" title="Stories">Stories</a> 
+      <a href="{{path('timeline')}}" title="Timeline">Timeline</a> 
+      <a href="{{path('locations')}}" title="Locations">Locations</a> 
+      <a href="{{path('about')}}" title="About">About</a> 
       {% endblock %}
     </nav>
     {% block footer %}
     <!-- script tags can go here -->
+    <script src="https://unpkg.com/vue"></script>
     {% endblock %}
   </body>
 </html>

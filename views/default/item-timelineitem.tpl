@@ -18,7 +18,7 @@
 </main>
 <nav>
   {% for item in itemList %}
-  <a href="{{path('timeline', {title:item.path})}}"><img src="{{path('img', {title:item.path})}}/thumbnail" /> {{item.title}}</a> 
+  <a href="{{path('timeline', {title:item.path})}}"><img src="{{path('img', {title:item.path, trail:'thumbnail'})}}" /> {{item.title}}</a> 
   {% endfor %}
 </nav>
 {% endblock %}
