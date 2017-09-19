@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 use MyTravel\Core\OutputInterface;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
 class Js implements OutputInterface {
 

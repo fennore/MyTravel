@@ -64,7 +64,13 @@ class OutputController {
     }
     // output files as file
     // // js
+    if ($request->getRequestFormat() === 'application/javascript') {
+      $this->outputHandler = new Js();
+    }
     // // css
+    if ($request->getRequestFormat() === 'text/css') {
+      $this->outputHandler = new Css();
+    }
     // // img
     $fileFormats = array(
       'image/*'
