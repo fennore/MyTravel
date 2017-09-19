@@ -7,7 +7,9 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 
-class Js {
+use MyTravel\Core\OutputInterface;
+
+class Js implements OutputInterface {
 
   public function viewJsBundle(Request $request) {
     $sq = new JSqueeze();
@@ -26,7 +28,12 @@ class Js {
         array_push($minifiedJs, $sq->squeeze($splFile->getContents()));
       }
     }
-    $response = new Response(implode('', $minifiedJs));
+
+    return implode('', $minifiedJs);
+  }
+
+  public function output(GetResponseForControllerResultEvent $event) {
+    $response = new Response($event->getControllerResult());
     $response->headers->set('Content-Type', 'application/javascript');
     return $response;
   }
