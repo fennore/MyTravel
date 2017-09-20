@@ -7,4 +7,14 @@ story:
     _type: MyTravel\Story\Model\Story
     _format: html
     title:
-
+storyapi:
+  path: api/story/{offset}/{length}/{extra}
+  methods: GET
+  schemes: https
+  defaults: 
+    _controller: MyTravel\Core\Controller\ItemController::output
+    _format: json
+    _type: MyTravel\Story\Model\Story
+    offset: 0
+    length: 10
+    extra:

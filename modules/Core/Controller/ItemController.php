@@ -36,6 +36,7 @@ class ItemController {
       $this->classCall = $type;
     }
   }
+
   /**
    * @todo collect into 1 throw,
    * needs to be of a custom exception form to catch and display as message.
@@ -51,6 +52,7 @@ class ItemController {
       throw new Exception('Item title cannot be empty');
     }
   }
+
   /**
    * Get Item by title from request.
    * This function should never be used to modify an item.
@@ -90,6 +92,11 @@ class ItemController {
     return $item->getPath();
   }
 
+  /**
+   * Generate a unique path for an Item from a given title
+   * @param string $pathTitle
+   * @return string
+   */
   public function getUniquePath($pathTitle) {
     $qb = Db::get()->createQueryBuilder();
     $expr = $qb
@@ -115,6 +122,12 @@ class ItemController {
     return $newPath;
   }
 
+  /**
+   * Get an ordered list of items limited by offset and length
+   * @param int $offset Defaults to 0
+   * @param int $length Defaults to 0
+   * @return array Doctrine ORM result list
+   */
   public function getItemList($offset = 0, $length = 0) {
     // Preparing query
     $qb = Db::get()->createQueryBuilder();
@@ -141,17 +154,61 @@ class ItemController {
   }
 
   /**
+   * Get the total amount of active Items
+   * @return int
+   */
+  public function getItemCount() {
+    $qb = Db::get()->createQueryBuilder();
+    $expr = $qb->expr()->eq('i.status', ':status');
+
+    $qb
+      ->select('count(i.id)')
+      ->from($this->classCall, 'i')
+      ->where($expr)
+      ->setParameter(':status', 1);
+    // Execute query
+    $query = $qb->getQuery();
+    return (int) $query->getSingleScalarResult();
+  }
+
+  /**
    * Get one or more items in paging format,
-   * through json API
+   * through json API.
+   * Use Symfony Routing requests with support for attributes:
+   * offset, length, extra
+   * @todo check how to properly implement an absolute limit
    * @param Request $request
    * @return type
    */
   public function output(Request $request) {
-    return $this->getItemList(
-      $request->attributes->get('offset'), $request->attributes->get('length')
+    $total = null;
+    $absoluteLimit = 1000;
+    $offset = $request->attributes->get('offset');
+    $length = $request->attributes->get('length');
+    if ($request->attributes->get('extra') === 'init') {
+      $total = $this->getItemCount();
+    }
+    if (isset($total) && $offset >= max($total - $length, 0)) {
+      $offset = $total - $length;
+    }
+    $results = $this->getItemList(
+      max($offset, 0)
+      , min(max($length, 1), $absoluteLimit)
+    );
+    return array(
+      'offset' => (int) $offset,
+      'limit' => (int) $length,
+      'numresults' => count($results),
+      'total' => $total,
+      'list' => $results
     );
   }
 
+  /**
+   * Create a new Item
+   * @param Request $request
+   * @return \MyTravel\Core\Controller\classCall
+   */
   public function create(Request $request) {
     $this->validateItemInput($request);
     $item = new $this->classCall($request->request->all());
@@ -163,6 +220,11 @@ class ItemController {
     return $item;
   }
 
+  /**
+   * Update an existing Item
+   * @param Request $request
+   * @return \MyTravel\Core\Controller\classCall|Response
+   */
   public function update(Request $request) {
     $this->validateItemInput($request);
     
@@ -184,6 +246,11 @@ class ItemController {
     return $item;
   }
 
+  /**
+   * Delete an existing Item
+   * @param Request $request
+   * @return type
+   */
   public function delete(Request $request) {
     $item = Db::get()
       ->find(

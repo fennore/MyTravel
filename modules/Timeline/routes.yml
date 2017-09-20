@@ -8,7 +8,7 @@ timeline:
     _format: html
     title:
 timelineapi:
-  path: api/timeline/{offset}/{length}
+  path: api/timeline/{offset}/{length}/{extra}
   methods: GET
   schemes: https
   defaults: 
@@ -17,3 +17,4 @@ timelineapi:
     _type: MyTravel\Timeline\Model\TimelineItem
     offset: 0
     length: 10
+    extra:
