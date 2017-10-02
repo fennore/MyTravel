@@ -22,7 +22,7 @@ class PageFactory {
 
   public static function viewItemPage(Request $request) {
     $ctrl = new ItemController();
-    $itemList = $ctrl->getItemList();
+    $itemList = $ctrl->getItemList(0, 25);
     if (!empty($request->attributes->get('title'))) {
       $item = $ctrl->getItemByTitle($request);
     } else if (!empty($itemList)) {

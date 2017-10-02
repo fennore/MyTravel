@@ -20,7 +20,6 @@ final class ApplicationConfiguration implements ConfigurationInterface {
         ->values(array('dev', 'staging', 'prod'))
       ->info('Which environment the application currently runs (dev|staging|prod).')
       ->end()
-      ->scalarNode('basepath')->defaultValue('/')->end()
       ->scalarNode('appname')->defaultValue('MyTravel')->end()
       ->scalarNode('view')->defaultValue('default')->end()
       ->arrayNode('modules')

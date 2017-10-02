@@ -183,17 +183,18 @@ class ItemController {
   public function output(Request $request) {
     $total = null;
     $absoluteLimit = 1000;
-    $offset = $request->attributes->get('offset');
-    $length = $request->attributes->get('length');
+    $offset = max($request->attributes->get('offset'), 0);
+    $length = max($request->attributes->get('length'), 1);
     if ($request->attributes->get('extra') === 'init') {
       $total = $this->getItemCount();
+      $baseLimit = max($total - $length, 0);
     }
-    if (isset($total) && $offset >= max($total - $length, 0)) {
-      $offset = $total - $length;
+    if (isset($total) && $offset >= $baseLimit) {
+      $offset = $baseLimit;
     }
     $results = $this->getItemList(
-      max($offset, 0)
-      , min(max($length, 1), $absoluteLimit)
+      $offset
+      , min($length, $absoluteLimit)
     );
     return array(
       'offset' => (int) $offset,

@@ -14,8 +14,8 @@
   </article>
 </main>
 <nav>
-  {% for item in itemList %}
-  <a href="{{path('item', {title:item.path})}}">{{item.title}}</a> 
+  {% for listitem in itemList %}
+  <a href="{{path('item', {title:listitem.path})}}">{{listitem.title}}</a> 
   {% endfor %}
 </nav>
 {% endblock %}

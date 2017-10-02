@@ -73,7 +73,7 @@ final class Config implements ServiceFactoryInterface {
         array('database' => $dbConfig) +
         array('routing' => $routingFileConfig)
       ;
-      return $this->verify($fullConfig);
+      return $fullConfig;
     }
   }
 
@@ -111,9 +111,9 @@ final class Config implements ServiceFactoryInterface {
   /**
    * Make sure all configuration values contain proper values
    * @todo Probably want to make use of validation / filtering with the treebuilder
+   * @deprecated
    */
   private function verify($config) {
-    $config['basepath'] = \preg_replace('/\/+/', '/', '/' . rtrim($config['basepath'], '/'));
     return $config;
   }
 
