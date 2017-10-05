@@ -51,4 +51,22 @@ trait ImageSource {
     return parent::__get($name);
   }
 
+  /**
+   * Temporarily set API data on the fly.
+   * @todo use settings with a backoffice etc. then this can be removed
+   * @return type
+   */
+  public function jsonSerialize() {
+    $this->setting = (object) array();
+    if (isset($this->property->exif['COMPUTED'])) {
+      $this->setting->ratio = $this->property->exif['COMPUTED']['Width'] / $this->property->exif['COMPUTED']['Height'];
+    }
+    $this->setting->thumbnail = (object) array(
+        'path' => $this->path . '/thumbnail',
+        'width' => 160,
+        'height' => 120
+    );
+    return parent::jsonSerialize($this);
+  }
+
 }
