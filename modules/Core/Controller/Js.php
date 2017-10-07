@@ -6,7 +6,6 @@ use Patchwork\JSqueeze;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-
 use MyTravel\Core\OutputInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 
