@@ -2,6 +2,9 @@
 namespace MyTravel\Location\Controller;
 
 use MyTravel\Core\ModuleControllerInterface;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\CoreEvents;
+use MyTravel\Location\ThemingListener;
 
 final class LocationController implements ModuleControllerInterface {
 
@@ -19,7 +22,9 @@ final class LocationController implements ModuleControllerInterface {
   }
 
   public function init() {
-    
+    // Themer event listener
+    $themingListener = new ThemingListener();
+    App::event()->addListener(CoreEvents::THEMERLOAD, array($themingListener, 'onLoad'));
   }
 
 }

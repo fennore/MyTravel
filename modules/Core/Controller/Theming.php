@@ -15,6 +15,8 @@ use Twig\Environment;
 use Twig\TwigFunction;
 use MyTravel\Core\OutputInterface;
 use MyTravel\Core\TemplateInterface;
+use MyTravel\Core\CoreEvents;
+use MyTravel\Core\Event\ThemingEvent;
 
 /**
  *
@@ -50,6 +52,9 @@ class Theming implements OutputInterface {
     // Add global variables
     $this->addGlobals();
     $this->addFunctions();
+    // Load themer event
+    $event = new ThemingEvent($this->themer);
+    App::event()->dispatch(CoreEvents::THEMERLOAD, $event);
   }
 
   private function setAssets() {
