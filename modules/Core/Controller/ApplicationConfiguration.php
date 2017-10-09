@@ -42,7 +42,7 @@ final class ApplicationConfiguration implements ConfigurationInterface {
 
   /**
    * Build the directories configuration.
-   * @todo Modules can add there own directories to the list.
+   * @todo Create directory if it does not exist?
    * @param Symfony\Component\Config\Definition\Builder\NodeBuilder $node
    */
   private function buildDirectoryNode($node) {

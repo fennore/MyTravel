@@ -64,6 +64,7 @@ final class Db implements ServiceFactoryInterface {
   public function connect($name = 'sqlite') {
     $dbConfig = $this->getConfiguration($name);
     $connections = Config::get()->database['connections'];
+    $this->createSqliteDirectory();
     $this->connection[$name] = EntityManager::create(
         $connections[$name], $dbConfig
     );
@@ -73,6 +74,18 @@ final class Db implements ServiceFactoryInterface {
       ->dispatch(CoreEvents::DBCONNECT, $event);
     $this->sync($name);
     return $this;
+  }
+  
+  /**
+   * Create sqlite directory if it does not exist
+   */
+  private function createSqliteDirectory() {
+    $connections = Config::get()->database['connections'];
+    foreach($connections as $connection) {
+      if($connection['driver'] === 'pdo_sqlite' && !is_dir(pathinfo($connection['path'], PATHINFO_DIRNAME))) {
+        mkdir(pathinfo($connection['path'], PATHINFO_DIRNAME), 0750, true);
+      }
+    }
   }
 
   /**

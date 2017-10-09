@@ -17,7 +17,7 @@ class PageFactory {
       $ctrlRoute->buildEncodedRoute();
     }
     $variables = array(
-      'stages' => range(1, $ctrlLocations->getLastStage()),
+      'stages' => $ctrlLocations->getLastStage() > 0 ? range(1, $ctrlLocations->getLastStage()) : array(),
       'locationlist' => $ctrlLocations->getStageLocations($request->attributes->get('stage'), 0)
     );
     return new Page('locations.tpl', $variables);

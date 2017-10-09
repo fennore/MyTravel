@@ -5,6 +5,7 @@
 {% block content %}
 <main id="content">
   <article>
+    {% if item %}
     <header>
       <h1>
         {{item.title}}
@@ -14,6 +15,7 @@
       <img src="{{path('img', {title:item.path})}}" />
       {{item.content}}
     </figure>
+    {% endif %}
   </article>
 </main>
 <nav>

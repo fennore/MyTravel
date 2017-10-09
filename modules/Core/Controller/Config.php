@@ -33,6 +33,7 @@ final class Config implements ServiceFactoryInterface {
     if (!(self::$config instanceof self)) {
       self::$config = new self();
       self::$config->configurationTree = self::$config->buildConfig();
+      self::$config->createDirectories();
     }
     return self::$config;
   }
@@ -42,7 +43,7 @@ final class Config implements ServiceFactoryInterface {
   }
 
   public function __get($name) {
-    return $this->configurationTree[$name];
+    return $this->configurationTree[$name] ?? null;
   }
 
   protected function buildConfig() {
@@ -115,6 +116,17 @@ final class Config implements ServiceFactoryInterface {
    */
   private function verify($config) {
     return $config;
+  }
+  
+  /**
+   * Create directories
+   */
+  private function createDirectories() {
+    foreach($this->configurationTree['directories'] as $directory) {
+      if(!is_dir($directory)) {
+        mkdir($directory, 0750, true);
+      }
+    }
   }
 
 }

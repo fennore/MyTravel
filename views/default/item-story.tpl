@@ -5,12 +5,14 @@
 {% block content %}
 <main id="content">
   <article>
+    {% if item %}
     <header>
       <h1>
         {{item.title}}
       </h1>
     </header>
     {{item.content|striptags('<br>')|raw}}
+    {% endif %}
   </article>
 </main>
 <nav>
