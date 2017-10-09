@@ -34,8 +34,10 @@ class OutputController {
         ->addListener(KernelEvents::REQUEST, array(self::$oc, 'defineOutput'));
       App::event()
         ->addListener(KernelEvents::VIEW, array(self::$oc, 'handleOutput'));
-      App::event()
-        ->addListener(KernelEvents::EXCEPTION, array(self::$oc, 'handleException'));
+      if(!App::get()->inDevelopment()) {
+        App::event()
+          ->addListener(KernelEvents::EXCEPTION, array(self::$oc, 'handleException'));
+      }
     }
     return self::$oc;
   }
