@@ -96,6 +96,7 @@ class FileController {
     // Fetch all files from files directory
     $dirFiles = Finder::create()
       ->files()
+      ->followLinks() // Follow symbolic links!
       ->in(Config::get()->directories['files']);
     $i = 0;
     foreach ($dirFiles as $splFile) {
