@@ -4,6 +4,7 @@ namespace MyTravel\Timeline\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Finder\Finder;
+use MyTravel\Core\Controller\App;
 use MyTravel\Core\Controller\ItemController;
 
 /**
@@ -12,6 +13,9 @@ use MyTravel\Core\Controller\ItemController;
  */
 class TimelineItemController {
   public function importLegacyData() {
+    if(!App::get()->inDevelopment()) {
+      return;
+    }
     // 1 . Get legacy data
     $finder = Finder::create()
       ->files()
