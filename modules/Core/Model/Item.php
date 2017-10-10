@@ -35,12 +35,13 @@ class Item implements JsonSerializable {
     $this->setPath();
   }
 
-  public function update($newData) {
+  public function update($newData = array()) {
     foreach ($newData as $col => $val) {
       $this->$col = $val;
     }
-    $this->setUpdated();
-    $this->setPath();
+    $this
+      ->setUpdated()
+      ->setPath();
   }
 
   public function __isset($name) {
@@ -61,15 +62,18 @@ class Item implements JsonSerializable {
   public function setTitle($newTitle) {
     $this->title = $newTitle;
     $this->setPath();
+    return $this;
   }
 
   public function setContent($newContent) {
     $this->content = $newContent;
+    return $this;
   }
 
   public function setUpdated() {
     $date = new DateTime();
     $this->updated = $date->getTimestamp();
+    return $this;
   }
 
   /**
@@ -78,6 +82,7 @@ class Item implements JsonSerializable {
    */
   public function setPath() {
     $this->path = App::get()->cleanPathString($this->title);
+    return $this;
   }
 
   public function getPath() {

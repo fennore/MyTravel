@@ -14,4 +14,5 @@ MyTravel\Timeline\Model\TimelineItem:
     setting:
       type: json
       nullable: true
-      
+  lifecycleCallbacks:
+    postLoad: [ postLoad ]

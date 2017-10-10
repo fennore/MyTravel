@@ -57,7 +57,7 @@ class FileController {
     $fileList = $this->getFiles($itemTypeClass::matchMime());
     // - get Source Items
     $ctrlItem = new ItemController($itemTypeClass);
-    $itemList = $ctrlItem->getItemList();
+    $itemList = $ctrlItem->getItemList(0, 0, null);
     // Match with file
     foreach ($itemList as $k => $item) {
       if (in_array($item->file, $fileList)) {

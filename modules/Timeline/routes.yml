@@ -18,3 +18,9 @@ timelineapi:
     offset: 0
     length: 10
     extra:
+legacyimport:
+  path: api/import/timeline/legacy
+  methods: GET
+  schemes: https
+  defaults:
+    _controller: MyTravel\Timeline\Controller\TimelineItemController::importLegacyData

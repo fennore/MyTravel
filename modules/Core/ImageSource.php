@@ -25,7 +25,9 @@ trait ImageSource {
     $this->sourceItemSetFile($file);
     // Add exif data
     try {
-      $this->property = (object) array();
+      if(!isset($this->property)) {
+        $this->property = (object) array();
+      }
       $exif = @\exif_read_data($this->file->getFullSource(), 'FILE,COMPUTED', true, false);
       $check = array('FILE' => NULL, 'COMPUTED' => NULL);
       $this->property->exif = array_intersect_key($exif, $check);
@@ -50,6 +52,11 @@ trait ImageSource {
     }
     return parent::__get($name);
   }
+  
+  public function postLoad() {
+    $this->property = (object) $this->property;
+    $this->setting = (object) $this->setting;
+  }
 
   /**
    * Temporarily set API data on the fly.
@@ -57,11 +64,13 @@ trait ImageSource {
    * @return type
    */
   public function jsonSerialize() {
-    $this->setting = (object) array();
+    if(!isset($this->setting)) {
+      $this->setting = (object) array();
+    }
     if (isset($this->property->exif['COMPUTED'])) {
       $this->setting->ratio = $this->property->exif['COMPUTED']['Width'] / $this->property->exif['COMPUTED']['Height'];
     }
-    $this->setting->thumbnail = (object) array(
+    $this->setting->thumbnail = array(
         'path' => $this->path . '/thumbnail',
         'width' => 160,
         'height' => 120

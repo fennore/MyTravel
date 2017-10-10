@@ -126,9 +126,10 @@ class ItemController {
    * Get an ordered list of items limited by offset and length
    * @param int $offset Defaults to 0
    * @param int $length Defaults to 0
+   * @param int $status Defaults to 1 Filters on status, set to null to ignore and not filter on status
    * @return array Doctrine ORM result list
    */
-  public function getItemList($offset = 0, $length = 0) {
+  public function getItemList($offset = 0, $length = 0, $status = 1) {
     // Preparing query
     $qb = Db::get()->createQueryBuilder();
     $expr = $qb
@@ -140,11 +141,14 @@ class ItemController {
     $qb
       ->select('i')
       ->from($this->classCall, 'i')
-      ->where($expr)
-      ->setParameter(':status', 1)
       ->orderBy('i.weight', 'ASC')
       ->addOrderBy('i.created', 'ASC')
       ->setFirstResult($offset);
+    if(is_int($status)) {
+      $qb
+        ->where($expr)
+        ->setParameter(':status', $status);
+    }
     if (!empty($length)) {
       $qb->setMaxResults($length);
     }
