@@ -51,6 +51,16 @@ class RouteController {
   private function getLocationLimit() {
     return (int) $this->driver->getRequestSize() * self::MAXREQUESTS;
   }
+  
+  /**
+   * Get the encoded route
+   * @return type
+   */
+  public function getEncodedRoute() {
+    $stateCtrl = new SavedStateController();
+    $routeState = $stateCtrl->get(self::STATEROUTE);
+    return $routeState->getState();
+  }
 
   /**
    * Resets encoded route to certain point,
@@ -61,6 +71,27 @@ class RouteController {
   public function resetEncodedRoute(int $stage) {
     // 1. Reset Direction SavedState to weight 0 and stage $stage
     // 2. Update Route SavedState removing all encoded routes of stage $stage only
+  }
+  
+  public function rebuildEncodedRoute(int $stage) {
+    // 1. Get state
+    $stateCtrl = new SavedStateController();
+    $routeState = $stateCtrl->get(self::STATEROUTE);
+    // Get directions from the stage
+    $qb = Db::get()->createQueryBuilder();
+    $expr = $qb->expr()->eq('d.stage', ':stage');
+    $qb
+      ->select('d')
+      ->from('\MyTravel\Location\Model\Direction', 'd')
+      ->where($expr)
+      ->setParameter(':stage', $stage)
+      ->orderBy('d.origin', 'ASC');
+    // 2. Directions
+    $directionsList = $qb->getQuery()->getResult();
+    // 3. Encoded route
+    $encodedRoute = array_map(array($this->driver, 'getPolyline'), $directionsList);
+    $routeState->set('stage' . $stage, $encodedRoute);
+    return $this;
   }
 
   /**
@@ -85,7 +116,7 @@ class RouteController {
       return;
     }
     // - Stop processing when weight is 0 but there are already encoded route parts
-    if ($directionState->get('weight') === 0 && !empty($routeState->get($stage))) {
+    if ($directionState->get('weight') === 0 && !empty($routeState->get('stage' . $stage))) {
       // Also set Direction SavedState to next stage
       $directionState->set('stage', ++$stage);
       Db::get()->flush();
@@ -100,7 +131,7 @@ class RouteController {
     array_map(array(Db::get(), 'persist'), $directionsList);
     array_map(
       array($routeState, 'add')
-      , array_pad(array(), count($encodedRoute), $stage)
+      , array_pad(array(), count($encodedRoute), 'stage' . $stage)
       , $encodedRoute
     );
 
@@ -120,6 +151,7 @@ class RouteController {
     }
     Db::get()->flush();
     Db::get()->clear();
+    return $this;
   }
 
 }

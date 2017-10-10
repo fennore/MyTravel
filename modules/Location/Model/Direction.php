@@ -11,6 +11,14 @@ class Direction {
   private $destination;
   private $stage;
   private $data;
+  
+  /**
+   * Called on postLoad Entity life cycle
+   * @see http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/events.html#lifecycle-callbacks
+   */
+  public function postLoad() {
+    $this->data = json_decode(json_encode($this->data));
+  }
 
   public function __isset($name) {
     return isset($this->$name);

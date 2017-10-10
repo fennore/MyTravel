@@ -21,3 +21,5 @@ MyTravel\Location\Model\Direction:
       unsigned: true
     data:
       type: json
+  lifecycleCallbacks:
+    postLoad: [ postLoad ]

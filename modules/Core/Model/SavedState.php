@@ -50,6 +50,7 @@ class SavedState {
 
   /**
    * Overwrite the full state object
+   * Warning!: do not use numeric values for state names!
    * @param stdClass $state
    */
   public function setState(stdClass $state) {
@@ -67,6 +68,7 @@ class SavedState {
 
   /**
    * Set a state value
+   * Warning!: do not use numeric values for state names!
    * @param string $name state name
    * @param mixed $value
    */
@@ -76,6 +78,7 @@ class SavedState {
 
   /**
    * Add a state value
+   * Warning!: do not use numeric values for state names!
    * @param string $name state name
    * @param type $value
    */
