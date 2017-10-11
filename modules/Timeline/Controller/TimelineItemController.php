@@ -36,12 +36,14 @@ class TimelineItemController {
         json_encode($timelineItem);
         // Update item
         $data = $dataList->$key;
-        $timelineItem
-          ->setting
-          ->location = array(
-          'lat' => (float) $data->lat,
-          'lng' => (float) $data->lng
-        );
+        if(isset($data->lat) && isset($data->lng)) {
+          $timelineItem
+            ->setting
+            ->location = array(
+            'lat' => (float) $data->lat,
+            'lng' => (float) $data->lng
+          );
+        }
         $timelineItem
           ->setTitle($data->title)
           ->setContent(strip_tags($data->description))
