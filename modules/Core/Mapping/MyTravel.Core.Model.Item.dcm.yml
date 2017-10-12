@@ -20,7 +20,7 @@ MyTravel\Core\Model\Item:
           itemId1:
             referencedColumnName: id
         inverseJoinColumns:
-          itemiId2:
+          itemId2:
             referencedColumnName: id
   fields:
     status:

@@ -92,6 +92,10 @@ class Item implements JsonSerializable {
   public function getLink() {
     return $this->link;
   }
+  
+  public function getWeight() {
+    return $this->weight;
+  }
 
   public function getType() {
     return strtolower((new \ReflectionClass($this))->getShortName());
