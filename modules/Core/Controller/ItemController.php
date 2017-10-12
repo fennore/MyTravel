@@ -106,7 +106,7 @@ class ItemController {
 
     $qb
       ->select('i.path')
-      ->from($this->classCall, 'i')
+      ->from('MyTravel\Core\Model\Item', 'i') // Paths must be unique on Item level
       ->where($expr)
       ->setParameter(':path', $pathTitle . '%');
     // Execute query
