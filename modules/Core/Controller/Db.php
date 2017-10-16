@@ -106,9 +106,7 @@ final class Db implements ServiceFactoryInterface {
       $paths[] = $mappingPath;
     }
     //
-    // see what it returns
-    // and look for best cross-module implementation
-    return Setup::createYAMLMetadataConfiguration($paths, App::get()->inDevelopment());
+    return Setup::createYAMLMetadataConfiguration($paths, (App::get()->inDevelopment() || !Config::get()->database['use_cache']));
   }
 
   /**

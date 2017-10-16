@@ -23,7 +23,8 @@ final class DatabaseConfiguration implements ConfigurationInterface {
       ->root('database')
         ->children();
     $node
-      ->scalarNode('character-set')->defaultValue('utf8')->end()
+      ->booleanNode('use_cache')->defaultValue(true)->end()
+      ->scalarNode('character_set')->defaultValue('utf8')->end()
       ->scalarNode('collate')->defaultValue('utf8_unicode_ci')->end()
       ->arrayNode('connections')
         ->useAttributeAsKey('name')
