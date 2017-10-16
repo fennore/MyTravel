@@ -100,7 +100,8 @@ class FileController {
       ->in(Config::get()->directories['files']);
     $i = 0;
     foreach ($dirFiles as $splFile) {
-      $id = array_search($splFile->getRelativePathname(), $dbFileSources);
+      $filePathName = str_replace('\\', '/', $splFile->getRelativePathname());
+      $id = array_search($filePathName, $dbFileSources);
       if ($id !== false) {
         // Skip already recorded files
         unset($dbFileSources[$id]);

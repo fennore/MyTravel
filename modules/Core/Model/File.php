@@ -40,8 +40,8 @@ class File {
 
   public function __construct(SplFileInfo $newData = null) {
     if (isset($newData)) {
-      $this->source = $newData->getRelativePathname();
-      $this->path = $newData->getRelativePath();
+      $this->source = str_replace('\\', '/', $newData->getRelativePathname()); // Always use / for directory separator
+      $this->path = str_replace('\\', '/', $newData->getRelativePath());
       $this->type = \mime_content_type($newData->getRealPath());
       $this->lastmodified = $newData->getMTime();
       //$this->data = $newData->getContents();
@@ -60,6 +60,11 @@ class File {
   public function getSupportedImageType() {
     $bitCheck = array_search($this->type, Image::types());
     return (imagetypes() & $bitCheck) ? $this->type : false;
+  }
+  
+  public function cleanPaths() {
+    $this->source = str_replace('\\', '/', $this->source); // Always use / for directory separator
+    $this->path = str_replace('\\', '/', $this->path);
   }
 
 }

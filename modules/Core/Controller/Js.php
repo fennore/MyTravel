@@ -18,6 +18,7 @@ class Js implements OutputInterface {
     $dirFiles = Finder::create()
       ->files()
       ->in(Config::get()->directories['views'] . '/' . Config::get()->view . '/js')
+      ->sortByType() // Force sorting, required for linux
       ->name('*.js');
 
     foreach ($dirFiles as $splFile) {
