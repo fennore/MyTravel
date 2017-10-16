@@ -108,6 +108,9 @@ final class Modules implements ServiceFactoryInterface {
    * A valid module has a map with the module name under the modules directory.
    * And a module controller class ModulenameController which
    * implements the Mytravel\Core\ModuleControllerInterface.
+   * 
+   * @todo there should be some form of module cache that remembers exact controller location and module instead of looping through all files every time
+   * This find should only happen in dev mode.
    *
    * @return array
    */
@@ -126,7 +129,7 @@ final class Modules implements ServiceFactoryInterface {
       // Add the module prefix to the autoloader
       if ($validFile && $validDirectory) {
         App::get()
-          ->addAutoloadPrefix('psr-4', 'MyTravel\\' . $moduleName, 'modules\\' . $moduleName);
+          ->addAutoloadPrefix('psr-4', 'MyTravel\\' . $moduleName, 'modules/' . $moduleName);
       }
       if ($validFile && $validDirectory && $this->validateControllerClass($moduleControllerClass)) {
         array_push($moduleList, new Module($moduleName));
