@@ -3,3 +3,5 @@
 /config/config.yml
 /views/euroturkey
 import
+.htaccess
+!.htaccess.default
