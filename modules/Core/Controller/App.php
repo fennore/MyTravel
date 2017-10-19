@@ -162,8 +162,8 @@ class App {
       /** @todo add message to php-error list */
       if ($this->inDevelopment()) {
         var_dump($ex->getTrace());
+        throw $ex;
       } // *** You haven't seen this ***
-      throw $ex;
     }
 
     return $this;
@@ -372,7 +372,6 @@ class App {
       $str = str_replace((array) $replace, ' ', $str);
     }
 
-    //$str = preg_replace(array('/�/', '/�/', '/�/', '/�/', '/�/', '/�/'), array('Ae', 'Oe', 'Ue', 'ae', 'oe', 'ue'), $str);
     $clean = iconv('UTF-8', 'ASCII//TRANSLIT', $str);
     $clean = preg_replace("/[^a-zA-Z0-9\/_|+ -]/", '', $clean);
     $clean = strtolower(trim($clean, '-'));
