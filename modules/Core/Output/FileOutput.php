@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Output;
 
 use ErrorException;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;

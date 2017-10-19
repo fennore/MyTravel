@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Output;
 
 use ErrorException;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
@@ -17,6 +17,9 @@ use MyTravel\Core\OutputInterface;
 use MyTravel\Core\TemplateInterface;
 use MyTravel\Core\CoreEvents;
 use MyTravel\Core\Event\ThemingEvent;
+use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\Controller\Routing;
 
 /**
  *

@@ -1,13 +1,15 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Output;
 
 use MatthiasMullie\Minify\CSS as minifyCss;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use MyTravel\Core\OutputInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use MyTravel\Core\OutputInterface;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\Controller\Config;
 
 class Css implements OutputInterface {
 

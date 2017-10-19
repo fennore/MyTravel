@@ -1,10 +1,12 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Output;
 
 use DOMDocument;
 use DOMElement;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\Controller\Config;
 
 class XmlOutput implements OutputInterface {
 
@@ -41,7 +43,7 @@ class XmlOutput implements OutputInterface {
   }
 
   /**
-   *
+   * @todo pretty much everything, this is just some old code floating around
    * @param type $gpxList
    * @param type $filename
    * @return \DOMDocument
@@ -49,7 +51,7 @@ class XmlOutput implements OutputInterface {
   private function outputGpx(GetResponseForControllerResultEvent $event) {
     $gpxlist;
     $filename;
-    $document = new \DOMDocument("1.0", 'UTF-8');
+    $document = new DOMDocument("1.0", 'UTF-8');
     $document->formatOutput = true;
     $gpx = $document->createElementNS("http://www.topografix.com/GPX/1/0", "gpx");
     $gpx->setAttribute("version", "1.0");

@@ -69,12 +69,12 @@ jsbundle:
   methods: GET
   schemes: https
   defaults:
-    _controller: MyTravel\Core\Controller\Js::viewJsBundle
+    _controller: MyTravel\Core\Output\Js::viewJsBundle
     _format: application/javascript
 cssbundle:
   path: css/bundle
   methods: GET
   schemes: https
   defaults:
-    _controller: MyTravel\Core\Controller\Css::viewCssBundle
+    _controller: MyTravel\Core\Output\Css::viewCssBundle
     _format: text/css

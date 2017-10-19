@@ -5,10 +5,17 @@ namespace MyTravel\Core\Controller;
 use DateTime;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Response;
 use MyTravel\Core\OutputInterface;
+use MyTravel\Core\Output\Css;
+use MyTravel\Core\Output\Js;
+use MyTravel\Core\Output\FileOutput;
+use MyTravel\Core\Output\XmlOutput;
+use MyTravel\Core\Output\JsonOutput;
+use MyTravel\Core\Output\Theming;
 
 /**
  * Singleton output
@@ -29,9 +36,10 @@ class OutputController {
   public static function listen() {
     if (!(self::$oc instanceof self)) {
       self::$oc = new self();
-
       App::event()
-        ->addListener(KernelEvents::REQUEST, array(self::$oc, 'defineOutput'));
+        ->addListener(KernelEvents::REQUEST, array(self::$oc, 'checkAccess'));
+      App::event()
+        ->addListener(KernelEvents::CONTROLLER, array(self::$oc, 'defineOutput'));
       App::event()
         ->addListener(KernelEvents::VIEW, array(self::$oc, 'handleOutput'));
       if(!App::get()->inDevelopment()) {
@@ -41,11 +49,13 @@ class OutputController {
     }
     return self::$oc;
   }
+  
   /**
-   * Sets the output handler according to the request
+   * Checks request access and returns 403 if needed.
+   * Used as KernelEvents listener callback.
    * @param GetResponseEvent $event
    */
-  public function defineOutput(GetResponseEvent $event) {
+  public function checkAccess(GetResponseEvent $event) {
     $request = $event->getRequest();
     // @todo replace with Symfony Security component (independent integration)
     if (!in_array($request->getMethod(), array('GET', 'HEAD')) && !App::get()->hasAccess()) {
@@ -53,9 +63,23 @@ class OutputController {
       $response = new Response($theming->render('403.tpl', array()));
       $response->setStatusCode(403);
       $event->setResponse($response);
-      return;
     }
-    // check getFormat vs getRequestFormat
+  }
+  
+  /**
+   * Sets the output handler according to the request.
+   * Used as KernelEvents listener callback.
+   * @param GetResponseEvent $event
+   */
+  public function defineOutput(FilterControllerEvent $event) {
+    // Check if controller is of OutputInterface and if so set it as such
+    $controller = $event->getController();
+    if($controller[0] instanceof OutputInterface) {
+      $this->outputHandler = $controller[0];
+      return; // Shortcut
+    }
+    $request = $event->getRequest();
+    // @todo Check getFormat vs getRequestFormat
     // application/json as json
     if ($request->getRequestFormat() === 'json') {
       $this->outputHandler = new JsonOutput();
