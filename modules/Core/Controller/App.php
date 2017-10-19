@@ -51,9 +51,7 @@ class App {
    */
   private $request;
 
-  protected function __construct() {
-
-  }
+  protected function __construct() {}
 
   /**
    * Interact with the application.
@@ -112,13 +110,19 @@ class App {
       if (empty($this->autoloader)) {
         throw new ErrorException('No proper autoloader has been set. This is required before building.');
       }
-      //
+      // Set service container
+      $this->serviceContainer = new ContainerBuilder();
+      // Set config service and load basic config
+      $this->serviceContainer
+        ->register('config')
+        ->setFactory('MyTravel\Core\Controller\Config::setService');
+      // Set request or shortcut with page cache
       $this->setRequest();
-      // Set services container
+      // Register all other services
       $this->registerServices();
       // Load Modules
       // => this needs to be done first after setting services
-      // - this will also load basic config
+      // - this will also load module config
       $this->serviceContainer
         ->get('modules')
         ->load();
@@ -136,10 +140,18 @@ class App {
       $this->serviceContainer
         ->get('routing')
         ->update();
+      // Db config
+      $this->serviceContainer
+        ->get('config')
+        ->addDatabaseConfig();
       // Connect to db
       $this->serviceContainer
         ->get('db')
         ->connect();
+      // Directory config
+      $this->serviceContainer
+        ->get('config')
+        ->addDirectoryConfig();
       // Initialize modules
       // - runs init on all active modules
       $this->serviceContainer
@@ -188,21 +200,12 @@ class App {
   }
 
   /**
-   * Make application services directly available,
-   * through the application from anywhere.
-   * This loads all fully independent services.
-   * The database service is dependant on config service
-   * and needs to be loaded separate later.
+   * Make application services directly available through the application from anywhere.
+   * This loads all services after the config service.
    * Use App::service() to access any service,
    * or use App::event() as alias to access the events service.
    */
   private function registerServices() {
-    $this->serviceContainer = new ContainerBuilder();
-    // Register some services
-    // Config
-    $this->serviceContainer
-      ->register('config')
-      ->setFactory('MyTravel\Core\Controller\Config::setService');
     // Modules
     $this->serviceContainer
       ->register('modules')

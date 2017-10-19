@@ -61,7 +61,15 @@ final class Db implements ServiceFactoryInterface {
     return self::$dbServiceController;
   }
 
+  /**
+   * Connect to database.
+   * This should only be called once.
+   * @todo This will needs rework with possibility of connecting to multiple databases
+   * @param type $name
+   * @return $this
+   */
   public function connect($name = 'sqlite') {
+    // Get ORM config
     $dbConfig = $this->getConfiguration($name);
     $connections = Config::get()->database['connections'];
     $this->createSqliteDirectory();

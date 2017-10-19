@@ -1,10 +1,11 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Config;
 
 use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use MyTravel\Core\Controller\App;
 use MyTravel\Core\Event\ConfigNodeEvent;
 use MyTravel\Core\CoreEvents;
 
@@ -28,28 +29,28 @@ final class DatabaseConfiguration implements ConfigurationInterface {
       ->scalarNode('collate')->defaultValue('utf8_unicode_ci')->end()
       ->arrayNode('connections')
         ->useAttributeAsKey('name')
-      ->defaultValue(array(
-        'sqlite' => array(
-          'driver' => 'pdo_sqlite',
-          'path' => './db-sqlite/mytravel.sqlite',
-        )
-      ))
-      ->prototype('array')
-      ->children()
-      ->enumNode('driver')
-        ->defaultValue('pdo_sqlite')
-        ->values($allowedDrivers)
-      ->end()
-      ->scalarNode('driverClass')->end()
-      ->scalarNode('pdo')->end()
-      ->scalarNode('dbname')->end()
-      ->scalarNode('user')->end()
-      ->scalarNode('password')->end()
-      ->scalarNode('host')->end()
-      ->scalarNode('path')->end()
-      ->end()
-            ->end()
+        ->defaultValue(array(
+          'sqlite' => array(
+            'driver' => 'pdo_sqlite',
+            'path' => './db-sqlite/mytravel.sqlite',
+          )
+        ))
+        ->prototype('array')
+        ->children()
+          ->enumNode('driver')
+            ->defaultValue('pdo_sqlite')
+            ->values($allowedDrivers)
           ->end()
+          ->scalarNode('driverClass')->end()
+          ->scalarNode('pdo')->end()
+          ->scalarNode('dbname')->end()
+          ->scalarNode('user')->end()
+          ->scalarNode('password')->end()
+          ->scalarNode('host')->end()
+          ->scalarNode('path')->end()
+          ->end()
+        ->end()
+      ->end()
     ;
     // Dispatch event for altering database config node
     $event = new ConfigNodeEvent($node);

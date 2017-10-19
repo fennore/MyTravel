@@ -28,6 +28,14 @@ final class Modules implements ServiceFactoryInterface {
     }
     return self::$controller;
   }
+  
+  private function config() {
+    if (!isset($this->modules)) {
+      $this->modules = $this->find();
+    }
+    // Build config listeners for modules before loading config during load
+    $this->addConfigListeners();
+  }
 
   /**
    * Load the modules.
@@ -36,11 +44,12 @@ final class Modules implements ServiceFactoryInterface {
    * @return $this
    */
   public function load() {
-    if (!isset($this->modules)) {
-      $this->modules = $this->find();
-    }
-    // Build config listeners for modules before loading config during load
-    $this->addConfigListeners();
+    // Add config listeners
+    // Trigger config injection for modules
+    $this->config();
+    // Set module config
+    Config::get()->addModuleConfig();
+    // Load modules
     foreach ($this->modules as $module) {
       $module->load();
     }

@@ -7,6 +7,10 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Definition\Processor;
+use MyTravel\Core\Config\ApplicationConfiguration;
+use MyTravel\Core\Config\DatabaseConfiguration;
+use MyTravel\Core\Config\ModuleConfiguration;
+use MyTravel\Core\Config\DirectoryConfiguration;
 
 final class Config implements ServiceFactoryInterface {
 
@@ -32,8 +36,7 @@ final class Config implements ServiceFactoryInterface {
   public static function setService() {
     if (!(self::$config instanceof self)) {
       self::$config = new self();
-      self::$config->configurationTree = self::$config->buildConfig();
-      self::$config->createDirectories();
+      self::$config->configurationTree = self::$config->buildBasicConfig();
     }
     return self::$config;
   }
@@ -46,7 +49,7 @@ final class Config implements ServiceFactoryInterface {
     return $this->configurationTree[$name] ?? null;
   }
 
-  protected function buildConfig() {
+  protected function buildBasicConfig() {
     // Wrap in a try as a config file is optional and can be pure default values
     $fileConfig = array();
     try {
@@ -57,25 +60,57 @@ final class Config implements ServiceFactoryInterface {
     } finally {
       // Set config processor
       $processor = new Processor();
-      $appFileConfig = array_diff_key($fileConfig, array('database' => null, 'routing' => null));
+      $appFileConfig = array_diff_key($fileConfig, array('directories' => null, 'modules' => null, 'database' => null, 'routing' => null));
       $dbFileConfig = $fileConfig['database'] ?? array();
       $routingFileConfig = $fileConfig['routing'] ?? array();
+      $moduleFileConfig = $fileConfig['modules'] ?? array();
+      $directoryFileConfig = $fileConfig['directories'] ?? array();
 
       // Load config defaults for application
       $appConfig = $processor->processConfiguration(
         new ApplicationConfiguration(), array($appFileConfig)
       );
-      // Load database schema, this can not be altered
-      $dbConfig = $processor->processConfiguration(
-        new DatabaseConfiguration(), array($dbFileConfig)
-      );
       
-      $fullConfig = $appConfig +
-        array('database' => $dbConfig) +
-        array('routing' => $routingFileConfig)
+      $basicConfig = $appConfig +
+        array('database' => $dbFileConfig) +
+        array('routing' => $routingFileConfig) +
+        array('modules' => $moduleFileConfig) +
+        array('directories' => $directoryFileConfig)
       ;
-      return $fullConfig;
+      return $basicConfig;
     }
+  }
+  
+  public function addModuleConfig() {
+    // Set config processor
+    $processor = new Processor();
+    // Load module configuration
+    $moduleConfig = $processor->processConfiguration(
+      new ModuleConfiguration(), array($this->configurationTree['modules'])
+    );
+    $this->configurationTree['modules'] = $moduleConfig;
+  }
+  
+  public function addDirectoryConfig() {
+    // Set config processor
+    $processor = new Processor();
+    // Load directories
+    $directoryConfig = $processor->processConfiguration(
+      new DirectoryConfiguration(), array($this->configurationTree['directories'])
+    );
+    $this->configurationTree['directories'] = $directoryConfig;
+    // Create directories
+    self::$config->createDirectories();
+  }
+  
+  public function addDatabaseConfig() {
+    // Set config processor
+    $processor = new Processor();
+    // Load database schema, this can not be altered
+    $dbConfig = $processor->processConfiguration(
+      new DatabaseConfiguration(), array($this->configurationTree['database'])
+    );
+    $this->configurationTree['database'] = $dbConfig;
   }
 
   public function addRoutingConfig() {
