@@ -7,15 +7,18 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 use MyTravel\Core\Config\ApplicationConfiguration;
 use MyTravel\Core\Config\DatabaseConfiguration;
 use MyTravel\Core\Config\ModuleConfiguration;
 use MyTravel\Core\Config\DirectoryConfiguration;
+use MyTravel\Core\Config\RoutingConfiguration;
 
 final class Config implements ServiceFactoryInterface {
 
   protected static $config;
   private $configurationTree;
+  private $fileConfig = array();
 
   protected function __construct() {
 
@@ -36,7 +39,7 @@ final class Config implements ServiceFactoryInterface {
   public static function setService() {
     if (!(self::$config instanceof self)) {
       self::$config = new self();
-      self::$config->configurationTree = self::$config->buildBasicConfig();
+      self::$config->configurationTree = self::$config->getBasicConfig();
     }
     return self::$config;
   }
@@ -49,85 +52,72 @@ final class Config implements ServiceFactoryInterface {
     return $this->configurationTree[$name] ?? null;
   }
 
-  protected function buildBasicConfig() {
+  protected function getBasicConfig() {
     // Wrap in a try as a config file is optional and can be pure default values
-    $fileConfig = array();
     try {
-      $fileConfig = $this->loadFromFile();
+      $this->fileConfig = $this->getConfigFromFile();
     } catch (Throwable $ex) {
       // Rethrow any throwable as it will be caught on the next level
       throw $ex;
     } finally {
       // Set config processor
       $processor = new Processor();
-      $appFileConfig = array_diff_key($fileConfig, array('directories' => null, 'modules' => null, 'database' => null, 'routing' => null));
-      $dbFileConfig = $fileConfig['database'] ?? array();
-      $routingFileConfig = $fileConfig['routing'] ?? array();
-      $moduleFileConfig = $fileConfig['modules'] ?? array();
-      $directoryFileConfig = $fileConfig['directories'] ?? array();
-
+      $preserveKeys = array('directories', 'modules', 'database', 'routing');
+      $appFileConfig = array_diff_key($this->fileConfig, array_flip($preserveKeys));
+      // Only keep unused fileConfig
+      $this->fileConfig = array_intersect_key($this->fileConfig, array_flip($preserveKeys));
       // Load config defaults for application
       $appConfig = $processor->processConfiguration(
         new ApplicationConfiguration(), array($appFileConfig)
       );
-      
-      $basicConfig = $appConfig +
-        array('database' => $dbFileConfig) +
-        array('routing' => $routingFileConfig) +
-        array('modules' => $moduleFileConfig) +
-        array('directories' => $directoryFileConfig)
-      ;
-      return $basicConfig;
+
+      return $appConfig;
     }
   }
   
-  public function addModuleConfig() {
+  /**
+   * Add configuration to the tree.
+   * Each section can be added once, or will just be ignored.
+   * @param ConfigurationInterface $configuration The configuration class to validate the configuration with
+   * @param type $key The configuration section name
+   */
+  protected function addToBasicConfig(ConfigurationInterface $configuration, $key) {
+    if(!isset($this->fileConfig[$key]) && isset($this->configurationTree[$key])) {
+      // @todo Set some message
+      return;
+    }
     // Set config processor
     $processor = new Processor();
     // Load module configuration
-    $moduleConfig = $processor->processConfiguration(
-      new ModuleConfiguration(), array($this->configurationTree['modules'])
+    $this->configurationTree[$key] = $processor->processConfiguration(
+      $configuration, array($this->fileConfig[$key] ?? array())
     );
-    $this->configurationTree['modules'] = $moduleConfig;
+    unset($this->fileConfig[$key]);  
+  }
+  
+  public function addModuleConfig() {
+    $this->addToBasicConfig(new ModuleConfiguration, 'modules');
   }
   
   public function addDirectoryConfig() {
-    // Set config processor
-    $processor = new Processor();
-    // Load directories
-    $directoryConfig = $processor->processConfiguration(
-      new DirectoryConfiguration(), array($this->configurationTree['directories'])
-    );
-    $this->configurationTree['directories'] = $directoryConfig;
+    $this->addToBasicConfig(new DirectoryConfiguration, 'directories');
     // Create directories
-    self::$config->createDirectories();
+    $this->createDirectories();
   }
   
   public function addDatabaseConfig() {
-    // Set config processor
-    $processor = new Processor();
-    // Load database schema, this can not be altered
-    $dbConfig = $processor->processConfiguration(
-      new DatabaseConfiguration(), array($this->configurationTree['database'])
-    );
-    $this->configurationTree['database'] = $dbConfig;
+    $this->addToBasicConfig(new DatabaseConfiguration, 'database');
   }
 
   public function addRoutingConfig() {
-    // Set config processor
-    $processor = new Processor();
-    // Load routing setup, only paths can be altered in config
-    $routingConfig = $processor->processConfiguration(
-      new RoutingConfiguration(), array($this->configurationTree['routing'])
-    );
-    $this->configurationTree['routing'] = $routingConfig;
+    $this->addToBasicConfig(new RoutingConfiguration, 'routing');
   }
 
   /**
    * Load configuration from file
    * @return array
    */
-  protected function loadFromFile() {
+  protected function getConfigFromFile() {
     // On a quest to load config from file
     $configDirectories = array('./config');
     $locator = new FileLocator($configDirectories);
@@ -143,15 +133,6 @@ final class Config implements ServiceFactoryInterface {
 
     return $delegatingLoader->load($configFile);
   }
-
-  /**
-   * Make sure all configuration values contain proper values
-   * @todo Probably want to make use of validation / filtering with the treebuilder
-   * @deprecated
-   */
-  private function verify($config) {
-    return $config;
-  }
   
   /**
    * Create directories
@@ -162,6 +143,7 @@ final class Config implements ServiceFactoryInterface {
         mkdir($directory, 0750, true);
       }
     }
+    return $this;
   }
 
 }

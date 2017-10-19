@@ -1,10 +1,11 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Config;
 
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use MyTravel\Core\Controller\Routing;
 
 final class RoutingConfiguration implements ConfigurationInterface {
 
@@ -13,9 +14,9 @@ final class RoutingConfiguration implements ConfigurationInterface {
     $node = $treeBuilder
       ->root('routing')
       ->children()
-      ->arrayNode('routes')
-      ->addDefaultsIfNotSet()
-      ->children();
+        ->arrayNode('routes')
+        ->addDefaultsIfNotSet()
+        ->children();
     
     $this->addConfigFromRouting($node);
     $node->end()->end();
@@ -26,8 +27,7 @@ final class RoutingConfiguration implements ConfigurationInterface {
    * Adding routes to config so they can be changed there
    * Note!
    * Only paths should be adjustable through the config.
-   * So only the path should be known in the config tree,
-   * for each named node.
+   * So only the path should be known in the config tree, for each named node.
    * Only the homepage should have a fixed path but adjustable callback.
    */
   private function addConfigFromRouting(NodeBuilder $node) {
