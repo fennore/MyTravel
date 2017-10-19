@@ -38,7 +38,7 @@ class RouteController {
    */
   public function __construct(DirectionsDriverInterface $driver = null) {
     if (empty($driver)) {
-      $directionsDriverClass = Config::get()->directionsdriver;
+      $directionsDriverClass = Config::get()->modules['location']['directionsdriver'];
       $driver = new $directionsDriverClass();
     }
     $this->driver = $driver;

@@ -42,10 +42,10 @@ class GapiDirectionsRequest {
   }
 
   private function getKey() {
-    if (empty(Config::get()->directionsdriveraccesskey)) {
-      throw new ErrorException('Requesting Google API Directions when no Key has been set. Add API key as directionsdriveraccesskey to your config.yml');
+    if (empty(Config::get()->modules['location']['directionsdriveraccesskey'])) {
+      throw new ErrorException('Requesting Google API Directions when no Key has been set. Add API key as directionsdriveraccesskey under location module to your config.yml');
     }
-    return Config::get()->directionsdriveraccesskey;
+    return Config::get()->modules['location']['directionsdriveraccesskey'];
   }
 
   public function getDirections() {
