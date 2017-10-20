@@ -5,6 +5,8 @@ namespace MyTravel\Core\Controller;
 use ErrorException;
 use Symfony\Component\Finder\Finder;
 use MyTravel\Core\Model\File;
+use MyTravel\Core\Service\Config;
+use MyTravel\Core\Service\Db;
 
 class FileController {
 

@@ -5,6 +5,7 @@ namespace MyTravel\Core\Controller;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use MyTravel\Core\Service\Db;
 
 /**
  * Controller for Items

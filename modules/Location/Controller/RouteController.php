@@ -2,8 +2,8 @@
 
 namespace MyTravel\Location\Controller;
 
-use MyTravel\Core\Controller\Config;
-use MyTravel\Core\Controller\Db;
+use MyTravel\Core\Service\Config;
+use MyTravel\Core\Service\Db;
 use MyTravel\Core\Controller\SavedStateController;
 use MyTravel\Location\Controller\LocationEntityController;
 use MyTravel\Location\Model\Direction;

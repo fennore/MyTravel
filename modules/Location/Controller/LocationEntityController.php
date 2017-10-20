@@ -4,8 +4,8 @@ namespace MyTravel\Location\Controller;
 
 use Doctrine\ORM\Query;
 use Symfony\Component\HttpFoundation\Request;
-use MyTravel\Core\Controller\Config;
-use MyTravel\Core\Controller\Db;
+use MyTravel\Core\Service\Config;
+use MyTravel\Core\Service\Db;
 use MyTravel\Core\Controller\FileController;
 use MyTravel\Core\Controller\SavedStateController;
 use MyTravel\Location\GpxReader;

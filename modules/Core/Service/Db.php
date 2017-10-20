@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Service;
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -11,6 +11,7 @@ use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Model\Module;
 use MyTravel\Core\Event\DbServiceEvent;
 use MyTravel\Core\CoreEvents;
+use MyTravel\Core\Controller\App;
 
 /**
  * @todo check for using more performant list iteration?

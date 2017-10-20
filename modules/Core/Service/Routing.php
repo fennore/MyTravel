@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Service;
 
 use Throwable;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
@@ -12,6 +12,7 @@ use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Event\RoutingEvent;
 use MyTravel\Core\CoreEvents;
 use MyTravel\Core\Model\Module;
+use MyTravel\Core\Controller\App;
 
 /**
  * Singleton service factory for routing

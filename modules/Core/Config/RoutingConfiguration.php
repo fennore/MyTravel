@@ -5,7 +5,7 @@ namespace MyTravel\Core\Config;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use MyTravel\Core\Controller\Routing;
+use MyTravel\Core\Service\Routing;
 
 final class RoutingConfiguration implements ConfigurationInterface {
 

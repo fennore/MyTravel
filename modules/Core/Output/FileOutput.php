@@ -7,7 +7,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use MyTravel\Core\OutputInterface;
-use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Service\Config;
 use MyTravel\Core\Model\ImageDataBag;
 
 class FileOutput implements OutputInterface {

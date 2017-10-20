@@ -3,7 +3,7 @@
 namespace MyTravel\Location\Gapi;
 
 use ErrorException;
-use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Service\Config;
 use MyTravel\Location\Model\Location;
 
 class GapiDirectionsRequest {

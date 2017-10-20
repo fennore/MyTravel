@@ -17,9 +17,9 @@ use MyTravel\Core\OutputInterface;
 use MyTravel\Core\TemplateInterface;
 use MyTravel\Core\CoreEvents;
 use MyTravel\Core\Event\ThemingEvent;
-use MyTravel\Core\Controller\Config;
 use MyTravel\Core\Controller\App;
-use MyTravel\Core\Controller\Routing;
+use MyTravel\Core\Service\Config;
+use MyTravel\Core\Service\Routing;
 
 /**
  *

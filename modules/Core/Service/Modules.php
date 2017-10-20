@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Service;
 
 use ErrorException;
 use ReflectionClass;
@@ -8,6 +8,7 @@ use MyTravel\Core\ServiceFactoryInterface;
 use MyTravel\Core\Model\Module;
 use Symfony\Component\Finder\Finder;
 use MyTravel\Core\CoreEvents;
+use MyTravel\Core\Controller\App;
 
 final class Modules implements ServiceFactoryInterface {
 

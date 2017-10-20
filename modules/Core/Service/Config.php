@@ -1,6 +1,6 @@
 <?php
 
-namespace MyTravel\Core\Controller;
+namespace MyTravel\Core\Service;
 
 use MyTravel\Core\ServiceFactoryInterface;
 use Symfony\Component\Config\FileLocator;
@@ -8,6 +8,8 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use MyTravel\Core\Controller\App;
+use MyTravel\Core\Controller\YamlConfigLoader;
 use MyTravel\Core\Config\ApplicationConfiguration;
 use MyTravel\Core\Config\DatabaseConfiguration;
 use MyTravel\Core\Config\ModuleConfiguration;

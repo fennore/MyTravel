@@ -16,6 +16,9 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use MyTravel\Core\Service\Routing;
+use MyTravel\Core\Service\Config;
+use MyTravel\Core\Service\Db;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -115,7 +118,7 @@ class App {
       // Set config service and load basic config
       $this->serviceContainer
         ->register('config')
-        ->setFactory('MyTravel\Core\Controller\Config::setService');
+        ->setFactory('MyTravel\Core\Service\Config::setService');
       // Set request or shortcut with page cache
       $this->setRequest();
       // Register all other services
@@ -209,18 +212,18 @@ class App {
     // Modules
     $this->serviceContainer
       ->register('modules')
-      ->setFactory('MyTravel\Core\Controller\Modules::setService');
+      ->setFactory('MyTravel\Core\Service\Modules::setService');
     // Routing
     $this->serviceContainer
       ->register('routing')
-      ->setFactory('MyTravel\Core\Controller\Routing::setService');
+      ->setFactory('MyTravel\Core\Service\Routing::setService');
     // Event dispatcher
     $this->serviceContainer
       ->register('events', 'Symfony\Component\EventDispatcher\EventDispatcher');
     // Database
     $this->serviceContainer
       ->register('db')
-      ->setFactory('MyTravel\Core\Controller\Db::setService');
+      ->setFactory('MyTravel\Core\Service\Db::setService');
   }
 
   /**

@@ -6,7 +6,7 @@ use DOMDocument;
 use DOMElement;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use MyTravel\Core\Controller\App;
-use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Service\Config;
 
 class XmlOutput implements OutputInterface {
 

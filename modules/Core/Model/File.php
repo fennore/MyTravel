@@ -3,7 +3,7 @@
 namespace MyTravel\Core\Model;
 
 use Symfony\Component\Finder\SplFileInfo;
-use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Service\Config;
 use MyTravel\Core\Controller\Image;
 
 class File {

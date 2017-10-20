@@ -3,7 +3,7 @@
 namespace MyTravel\Core\Model;
 
 use OverflowException;
-use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Service\Config;
 
 /**
  * Module wrapper class,

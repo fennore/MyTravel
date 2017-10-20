@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use MyTravel\Core\OutputInterface;
 use MyTravel\Core\Controller\App;
-use MyTravel\Core\Controller\Config;
+use MyTravel\Core\Service\Config;
 
 class Js implements OutputInterface {
 

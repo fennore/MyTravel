@@ -2,7 +2,7 @@
 
 namespace MyTravel\Location;
 
-use MyTravel\Core\Controller\Db;
+use MyTravel\Core\Service\Db;
 use MyTravel\Core\Model\File;
 use MyTravel\Location\Model\Location;
 
