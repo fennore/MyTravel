@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpFoundation\Response;
+use MyTravel\Core\Service\Config;
 use MyTravel\Core\OutputInterface;
 use MyTravel\Core\Output\Css;
 use MyTravel\Core\Output\Js;
@@ -130,12 +131,13 @@ class OutputController {
       $methodCheck = $event->getRequest()->getMethod() === 'GET';
       $lastModCheck = empty($response->getLastModified());
       if ($methodCheck) {
+        $seconds = Config::get()->pagecachetime;
         $response
           /**
            * Set max age as shared (public) for CDN support
            */
-          ->setSharedMaxAge(60 * 60 * 24) //
-          ->setExpires(new DateTime('1 day'));
+          ->setSharedMaxAge($seconds) //
+          ->setExpires(new DateTime('+' . $seconds . ' seconds'));
       }
       if ($methodCheck && $lastModCheck) {
         $response->setLastModified(new DateTime());

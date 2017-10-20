@@ -320,11 +320,12 @@ class App {
     // Check caching and exit if so
     // - create a dummy response for possible 304
     $response = new Response();
-    $response->setLastModified(new DateTime('-1 day'));
+    $seconds = Config::get()->pagecachetime;
+    $response->setLastModified(new DateTime('-' . $seconds . ' seconds'));
     if ($response->isNotModified($this->getRequest())) {
-      $response->setPublic();
-      $response->setSharedMaxAge(60 * 60 * 24);
-      $response->send();
+      $response
+        ->setSharedMaxAge($seconds)
+        ->send();
       exit();
     }
     // Add better json request support
