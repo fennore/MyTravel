@@ -1,0 +1,4 @@
+[submodule "lib/Security"]
+	path = lib/Security
+	url = https://github.com/symfony/security.git
+	branch = 3.4
