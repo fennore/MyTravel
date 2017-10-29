@@ -98,13 +98,6 @@ class App {
    * Build the application.
    * This loads all modules, and dispatches events.
    * @todo support composer (set composer as autoloader?)
-   * @todo split config between db / app / route
-   * => load db config as first (for possible module config in db)
-   * => load module config (status / active / event weights)
-   * => then load modules
-   * => load app config
-   * => load routing
-   * => update routing
    * @return App
    * @throws ErrorException
    */

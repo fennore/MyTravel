@@ -63,6 +63,8 @@ final class Routing implements ServiceFactoryInterface {
   }
   /**
    * Build routing
+   * @todo fix conflict between module routing availability for valid config,
+   * even if the module is disabled. And routing of disabled modules not accessible.
    */
   public function build() {
     // Get possible route file directories
@@ -74,7 +76,7 @@ final class Routing implements ServiceFactoryInterface {
     $this->routes = $loader->load('routes.yml');
     // Add modules routes from file
     array_map(array($this, 'concatRoute'), $directories);
-    // Dispatch event for altering application directories config node
+    // Dispatch event for altering the built routing
     $event = new RoutingEvent($this->routes);
     App::event()->dispatch(CoreEvents::BUILDROUTES, $event);
   }
