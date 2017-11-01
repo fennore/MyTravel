@@ -1,0 +1,28 @@
+loginform:
+  path: user/login
+  methods: GET
+  schemes: https
+  defaults:
+    _controller:
+    format: html
+registerform:
+  path: user/register
+  methods: GET
+  schemes: https
+  defaults:
+    _controller:
+    format: html
+authenticate:
+  path: api/user/authenticate
+  methods: POST
+  schemes: https
+  defaults:
+    _controller:
+    format: json
+register:
+  path: api/user/register
+  methods: POST
+  schemes: https
+  defaults:
+    _controller:
+    format: json
