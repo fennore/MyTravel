@@ -189,8 +189,11 @@ class App {
     $response->send();
 
     $kernel->terminate($this->getRequest(), $response);
-    // Execute any queries left behind
-    Db::flushAll();
+    
+    if($this->inDevelopment()) {
+      // Execute any queries left behind
+      Db::flushAll();
+    }
 
     return $this;
   }
