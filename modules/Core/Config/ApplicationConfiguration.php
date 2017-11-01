@@ -14,7 +14,7 @@ final class ApplicationConfiguration implements ConfigurationInterface {
       ->root('application')
       ->children();
     $node
-      ->enumNode('environment')->defaultValue('dev')
+      ->enumNode('environment')->defaultValue('prod')
         ->values(array('dev', 'staging', 'prod'))
         ->info('Which environment the application currently runs (dev|staging|prod).')
       ->end()
