@@ -3,6 +3,7 @@
 namespace MyTravel\Core\Controller;
 
 use MyTravel\Core\Model\SavedState;
+use MyTravel\Core\Service\Db;
 
 class SavedStateController {
 
