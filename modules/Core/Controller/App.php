@@ -59,7 +59,7 @@ class App {
   /**
    * Interact with the application.
    * This simply returns the application object.
-   * @return App
+   * @return MyTravel\Core\Controller\App
    */
   public static function get() {
     return self::$app;
@@ -206,20 +206,26 @@ class App {
    */
   private function registerServices() {
     // Modules
-    $this->serviceContainer
-      ->register('modules')
-      ->setFactory('MyTravel\Core\Service\Modules::setService');
+    $this->addService('modules', 'MyTravel\Core\Service\Modules::setService');
     // Routing
-    $this->serviceContainer
-      ->register('routing')
-      ->setFactory('MyTravel\Core\Service\Routing::setService');
+    $this->addService('routing', 'MyTravel\Core\Service\Routing::setService');
     // Event dispatcher
     $this->serviceContainer
       ->register('events', 'Symfony\Component\EventDispatcher\EventDispatcher');
     // Database
+    $this->addService('db', 'MyTravel\Core\Service\Db::setService');
+  }
+  
+  /**
+   * Add a Service to the application.
+   * A service is expected to be of ServiceFactoryInterface.
+   * @param string $name Unique name for the service. Will overwrite any existing service under the same name.
+   * @param string $factory Callback for the ServiceFactory class that will initiate the service.
+   */
+  public function addService($name, $factory) {
     $this->serviceContainer
-      ->register('db')
-      ->setFactory('MyTravel\Core\Service\Db::setService');
+      ->register($name)
+      ->setFactory($factory);
   }
 
   /**
