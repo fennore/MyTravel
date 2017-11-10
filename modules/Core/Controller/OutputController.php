@@ -57,9 +57,7 @@ class OutputController {
    * @param GetResponseEvent $event
    */
   public function checkAccess(GetResponseEvent $event) {
-    $request = $event->getRequest();
-    // @todo replace with Symfony Security component (independent integration)
-    if (!in_array($request->getMethod(), array('GET', 'HEAD')) && !App::get()->hasAccess()) {
+    if (!App::get()->hasAccess()) {
       $theming = new Theming();
       $response = new Response($theming->render('403.tpl', array()));
       $response->setStatusCode(403);

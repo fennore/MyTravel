@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use MyTravel\Core\Service\Routing;
 use MyTravel\Core\Service\Config;
 use MyTravel\Core\Service\Db;
+use MyTravel\Core\Service\Access;
 
 /**
  * Singleton Application controller for setting up the application.
@@ -214,6 +215,8 @@ class App {
       ->register('events', 'Symfony\Component\EventDispatcher\EventDispatcher');
     // Database
     $this->addService('db', 'MyTravel\Core\Service\Db::setService');
+    // Access
+    $this->addService('access', 'MyTravel\Core\Service\Access::setService');
   }
   
   /**
@@ -387,15 +390,12 @@ class App {
   }
 
   /**
-   * @todo use an authentication service (Symfony)
-   * This should not stay within App but move to some kind of User / Auth controller
-   * @param type $key
-   * @param type $access
-   * @param type $user
+   * Alias for Access::granted
+   * @param type $accessKey
    * @return boolean
    */
-  public function hasAccess($key = 'default', $access = array(), $user = null) {
-    return Config::get()->environment === 'dev';
+  public function hasAccess($accessKey = 'app.path') {
+    return Access::granted($accessKey);
   }
 
 }
