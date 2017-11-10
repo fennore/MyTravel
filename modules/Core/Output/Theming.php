@@ -82,7 +82,7 @@ class Theming implements OutputInterface {
 
   private function addGlobals() {
     $svgSpritePath = $this->themeDirectory . '/img/sprite.svg';
-    $this->themer->addGlobal('canEdit', App::get()->hasAccess());
+    $this->themer->addGlobal('canEdit', App::get()->hasAccess('app.admin'));
     $this->themer->addGlobal('basepath', App::get()->basePath());
     if (\file_exists($svgSpritePath)) {
       $this->themer->addGlobal('svgsprite', \file_get_contents($svgSpritePath));
@@ -92,6 +92,7 @@ class Theming implements OutputInterface {
   private function addFunctions() {
     $this->themer->addFunction(new TwigFunction('path', array(Routing::get(), 'path')));
     $this->themer->addFunction(new TwigFunction('asset', array($this->assets, 'getUrl')));
+    $this->themer->addFunction(new TwigFunction('access', array('Access', 'granted')));
   }
 
   /**
