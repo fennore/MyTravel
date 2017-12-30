@@ -2,6 +2,9 @@
 namespace MyTravel\User\Controller;
 
 use MyTravel\Core\ModuleControllerInterface;
+use MyTravel\Core\Controller\App;
+use Symfony\Component\Security\Http\Firewall;
+use Symfony\Component\Security\Http\FirewallMap;
 
 class UserController implements ModuleControllerInterface {
   
@@ -18,6 +21,20 @@ class UserController implements ModuleControllerInterface {
   }
   
   public function init() {
+    //App::get()->addService('access', '::setService');
+   
+    
+    // testing
+    $listeners = array(
+      new Firewall\UsernamePasswordJsonAuthenticationListener(),
+      new Firewall\RememberMeListener(),
+      new Firewall\LogoutListener(),
+      new Firewall\AnonymousAuthenticationListener()
+    );
+    $fireWallMap = new FirewallMap();
+    $fireWallMap->add($requestMatcher, $listeners);
+    $fireWall = new Firewall($map, App::event());
+    App::event()->addSubscriber($fireWall);
     
   }
 }

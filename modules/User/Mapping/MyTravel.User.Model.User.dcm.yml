@@ -6,3 +6,18 @@ MyTravel\User\Model\User:
       type: integer
       generator:
         strategy: AUTO
+  fields:
+    username:
+      type: string
+      unique: true
+    password:
+      type: string
+    salt:
+      type: string
+    status:
+      type: smallint
+      unsigned: true
+    created:
+      type: integer
+      unsigned: true
+    

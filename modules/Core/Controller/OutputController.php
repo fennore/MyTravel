@@ -37,8 +37,9 @@ class OutputController {
   public static function listen() {
     if (!(self::$oc instanceof self)) {
       self::$oc = new self();
+      /** single responsibility, output controller does not do access checking
       App::event()
-        ->addListener(KernelEvents::REQUEST, array(self::$oc, 'checkAccess'));
+        ->addListener(KernelEvents::REQUEST, array(self::$oc, 'checkAccess'));*/
       App::event()
         ->addListener(KernelEvents::CONTROLLER, array(self::$oc, 'defineOutput'));
       App::event()
@@ -55,6 +56,7 @@ class OutputController {
    * Checks request access and returns 403 if needed.
    * Used as KernelEvents listener callback.
    * @param GetResponseEvent $event
+   * @deprecated
    */
   public function checkAccess(GetResponseEvent $event) {
     if (!App::get()->hasAccess()) {
